@@ -1,0 +1,53 @@
+<!-- <nav class="nav">
+  <div class="nav-left">
+    <img src="/public/board.svg" alt="jekeel-logo" class="logo" />
+  </div>
+<ul class="nav-links">
+  <li><a href="#">Home</a></li>
+  <li><a href="#about">About</a></li>
+  <li><a href="#services">Services</a></li>
+  <li><a href="#contact">Contact</a></li>
+</ul>
+
+  <div class="nav-right">
+    <button onclick="location.href='/login'" class="btn-outline">Login / Signup</button>
+  </div>
+</nav> -->
+
+<nav class="nav">
+  <div class="nav-left">
+    <img src="/public/board.svg" alt="jekeel-logo" class="logo" />
+  </div>
+
+  <ul class="nav-links">
+    <li><a href="#">Home</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+
+  <div class="nav-right">
+    <!-- When NOT logged in -->
+    <button
+      *ngIf="!isLoggedIn"
+      (click)="goToLogin()"
+      class="btn-outline"
+      type="button"
+    >
+      Login / Signup
+    </button>
+
+    <!-- When logged in -->
+    <div *ngIf="isLoggedIn" class="user-menu">
+      <button class="btn-outline user-btn" type="button">
+        {{ userName }}
+      </button>
+
+      <div class="dropdown">
+        <button class="dropdown-item" type="button" (click)="logout()">
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
