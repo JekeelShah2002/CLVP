@@ -28,9 +28,16 @@
                     <input id="password" [type]="showPassword ? 'text' : 'password'" formControlName="password"
                         autocomplete="current-password" placeholder="••••••••" style="padding-right:56px" />
 
-                    <button style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:transparent;border:none;color:rgba(210,
-                        230, 255, 0.7);cursor:pointer;font-weight:700;padding:6px;border-radius:8px" type="button" id="togglePwd" (click)="togglePwd()">{{ showPassword ? '>HIDE' : '>SHOW' }}
-                        </button>
+                    <button
+            type="button"
+            id="togglePwd"
+            aria-label="Show password"
+            title="Show password"
+            (click)="togglePwd()"
+            style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:transparent;border:none;color:rgba(210, 230, 255, 0.7);cursor:pointer;font-weight:700;padding:6px;border-radius:8px"
+          >
+            {{ showPassword ? 'HIDE' : 'SHOW' }}
+          </button>
                 </div>
             </div>
 
