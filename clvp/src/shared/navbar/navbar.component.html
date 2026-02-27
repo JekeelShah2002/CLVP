@@ -28,22 +28,17 @@
 
   <div class="nav-right">
     <!-- When NOT logged in -->
-    <button
-      *ngIf="!isLoggedIn()"
-      (click)="goToLogin()"
-      class="btn-outline"
-      type="button"
-    >
+    <button *ngIf="!isLoggedIn()" (click)="goToLogin()" class="btn-outline" type="button">
       Login / Signup
     </button>
 
     <!-- When logged in -->
     <div *ngIf="isLoggedIn()" class="user-menu">
-      <button class="btn-outline user-btn" type="button">
+      <button class="btn-outline user-btn" type="button" (click)="toggleDropdown()">
         Hello, {{ userName() }}
       </button>
 
-      <div class="dropdown">
+      <div class="dropdown" [class.show]="isDropdownOpen">
         <button class="dropdown-item" type="button" (click)="logout()">
           Logout
         </button>
