@@ -7,6 +7,7 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../app/core/auth.service';
+import { NotificationService } from '../../app/core/notification.service';
 
 @Component({
   selector: 'app-login',
@@ -19,6 +20,7 @@ export class LoginComponent {
   private fb = inject(NonNullableFormBuilder);
   private router = inject(Router);
   private auth = inject(AuthService);
+  private ns = inject(NotificationService);
 
   isSubmitting = false;
   showPassword = false;
@@ -34,6 +36,7 @@ export class LoginComponent {
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.ns.error('Please fill all fields correctly (Password must be at least 8 chars).');
       return;
     }
 
@@ -45,12 +48,12 @@ export class LoginComponent {
       await this.auth.login(email, password);
 
       // ✅ Success Modal
-      alert('✅ Login successful! Welcome back.');
+      this.ns.success('Login successful! Welcome back.');
 
       await this.router.navigateByUrl('/home');
     } catch (e: any) {
       // ❌ Error Modal
-      alert('❌ Invalid email or password. Please try again.');
+      this.ns.error('Invalid email or password. Please try again.');
     } finally {
       this.isSubmitting = false;
     }

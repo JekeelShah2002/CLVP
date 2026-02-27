@@ -1,0 +1,62 @@
+:root {
+  --bg-1: #030216;
+  --neon-cyan: #52fff0;
+  --neon-mag: #9b6bff;
+  --glass: rgba(255, 255, 255, 0.04);
+  --glass-2: rgba(255, 255, 255, 0.02);
+  --accent: #7affff;
+}
+* {
+  box-sizing: border-box;
+}
+
+/* full-screen canvas background */
+#bg-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+canvas {
+  display: block;
+}
+
+/* container */
+.stage {
+  position: relative;
+  z-index: 3;
+  /* height: calc(100vh - 80px); */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+}
+
+/* login panel */
+.card {
+  width: 85%;
+  /* max-width: 94vw; */
+  padding: 28px;
+  border-radius: 16px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.02),
+    rgba(255, 255, 255, 0.01)
+  );
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(8px) saturate(1.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(120deg, var(--neon-cyan), var(--neon-mag));
+  filter: blur(18px);
+  opacity: 0.12;
+  pointer-events: none;
+}

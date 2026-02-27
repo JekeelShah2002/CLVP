@@ -29,7 +29,7 @@
   <div class="nav-right">
     <!-- When NOT logged in -->
     <button
-      *ngIf="!isLoggedIn"
+      *ngIf="!isLoggedIn()"
       (click)="goToLogin()"
       class="btn-outline"
       type="button"
@@ -38,9 +38,9 @@
     </button>
 
     <!-- When logged in -->
-    <div *ngIf="isLoggedIn" class="user-menu">
+    <div *ngIf="isLoggedIn()" class="user-menu">
       <button class="btn-outline user-btn" type="button">
-        Hello, {{ userName }}
+        Hello, {{ userName() }}
       </button>
 
       <div class="dropdown">

@@ -173,7 +173,7 @@ input:focus {
   font-size: 13px;
   color: rgba(210, 230, 255, 0.7);
   text-align: center;
-  margin-top: 10px;
+  /* margin-top: 10px; */
 }
 
 /* small social / actions */
@@ -181,7 +181,7 @@ input:focus {
   display: flex;
   gap: 10px;
   justify-content: center;
-  margin-top: 16px;
+  /* margin-top: 10px; */
 }
 .ghost {
   padding: 8px 12px;

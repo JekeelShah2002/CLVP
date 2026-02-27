@@ -1,4 +1,6 @@
-export const environment = {
+import { AppEnvironment } from './environment.development';
+
+export const environment: AppEnvironment = {
   production: false,
   appwrite: {
     endpoint: 'https://sfo.cloud.appwrite.io/v1', // or your self-hosted endpoint

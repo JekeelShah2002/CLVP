@@ -7,6 +7,7 @@ import {
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../app/core/auth.service';
+import { NotificationService } from '../../app/core/notification.service';
 
 @Component({
   selector: 'app-signup',
@@ -19,6 +20,7 @@ export class SignupComponent {
   private fb = inject(NonNullableFormBuilder);
   private auth = inject(AuthService);
   private router = inject(Router);
+  private ns = inject(NotificationService);
 
   isSubmitting = false;
   showPassword = false;
@@ -38,7 +40,7 @@ export class SignupComponent {
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      alert('❌ Please fill all fields correctly.');
+      this.ns.error('Please fill all fields correctly.');
       return;
     }
 
@@ -50,12 +52,12 @@ export class SignupComponent {
       await this.auth.signUp(email, password, name);
 
       // ✅ Success modal
-      alert('✅ Account created successfully! You are now logged in.');
+      this.ns.success('Account created successfully! You are now logged in.');
 
       await this.router.navigateByUrl('/home');
     } catch (e: any) {
       const msg = e?.message ?? 'Signup failed. Please try again.';
-      alert(`❌ ${msg}`);
+      this.ns.error(msg);
     } finally {
       this.isSubmitting = false;
     }

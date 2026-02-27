@@ -1,5 +1,15 @@
-export const environment = {
+export interface AppEnvironment {
+    production: boolean;
+    appwrite: {
+        endpoint: string;
+        projectId: string;
+    };
+}
+
+export const environment: AppEnvironment = {
     production: false,
-    appwriteEndpoint: 'https://sfo.cloud.appwrite.io/v1',
-    appwriteProjectId: '698a323e001706b3ff01',
+    appwrite: {
+        endpoint: 'https://sfo.cloud.appwrite.io/v1',
+        projectId: '698a323e001706b3ff01',
+    },
 };
