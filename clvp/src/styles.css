@@ -1,9 +1,9 @@
-
 html,
 body {
   height: 100%;
   margin: 0;
   font-family:
+    "Manrope",
     Inter,
     ui-sans-serif,
     system-ui,
@@ -11,7 +11,4 @@ body {
     Roboto,
     "Helvetica Neue",
     Arial;
-  background: linear-gradient(270deg,rgb(38, 4, 62), rgb(36, 36, 121));
-	overflow-x:hidden;
-	overflow-y:hidden;
 }

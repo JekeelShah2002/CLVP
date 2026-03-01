@@ -1,0 +1,50 @@
+.loader {
+    width: 60px;
+    height: 60px;
+    position: relative;
+    z-index: 1;
+    transform: translateX(-50%);
+}
+
+.loader::before,
+.loader::after {
+    content: '';
+    position: absolute;
+    width: inherit;
+    height: inherit;
+    border-radius: 50%;
+    mix-blend-mode: screen;
+    /* Changed multiply to screen for dark backgrounds */
+    animation: rotate92523 2s infinite cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.loader::before {
+    background-color: #3b82f6;
+    /* primary blue */
+}
+
+.loader::after {
+    background-color: #8b5cf6;
+    /* accent purple */
+    animation-delay: 1s;
+}
+
+@keyframes rotate92523 {
+
+    0%,
+    100% {
+        left: 35px;
+    }
+
+    25% {
+        transform: scale(.3);
+    }
+
+    50% {
+        left: 0%;
+    }
+
+    75% {
+        transform: scale(1);
+    }
+}

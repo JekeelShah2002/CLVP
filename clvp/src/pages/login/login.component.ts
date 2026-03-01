@@ -8,6 +8,7 @@ import {
 import { Router } from '@angular/router';
 import { AuthService } from '../../app/core/auth.service';
 import { NotificationService } from '../../app/core/notification.service';
+import { LoaderService } from '../../app/core/loader.service';
 
 @Component({
   selector: 'app-login',
@@ -21,6 +22,7 @@ export class LoginComponent {
   private router = inject(Router);
   private auth = inject(AuthService);
   private ns = inject(NotificationService);
+  private loader = inject(LoaderService);
 
   isSubmitting = false;
   showPassword = false;
@@ -41,6 +43,7 @@ export class LoginComponent {
     }
 
     this.isSubmitting = true;
+    this.loader.show();
 
     const { email, password } = this.form.getRawValue();
 
@@ -56,6 +59,7 @@ export class LoginComponent {
       this.ns.error('Invalid email or password. Please try again.');
     } finally {
       this.isSubmitting = false;
+      this.loader.hide();
     }
   }
 

@@ -1,10 +1,129 @@
 <div id="bg-wrap"></div>
 
 <div class="stage">
-    <div class="card" role="region" aria-labelledby="loginTitle">
+    <div class="card" role="region" aria-labelledby="homeTitle">
         <div class="neon-corner" aria-hidden="true"></div>
-        <div class="intro">
-            Hello Jekeel
+
+        <div class="header">
+            <h1 id="homeTitle">Welcome, {{ (auth.currentUser()?.name || auth.currentUser()?.email || 'Guest') |
+                titlecase }}</h1>
+            <p class="subtitle">Upload your historical data to generate intelligent CLV predictions</p>
         </div>
+
+        <div class="upload-grid">
+
+            <!-- Customers Upload Zone -->
+            <div class="upload-column">
+                <h2 class="zone-title">1. Customers Data</h2>
+                <div class="format-selector">
+                    <label>Delimiter:</label>
+                    <select [(ngModel)]="customersDelimiter" (change)="onDelimiterChange('customers')">
+                        <option value=",">Comma (CSV/TXT)</option>
+                        <option value="\t">Tab (TSV/TXT)</option>
+                    </select>
+                </div>
+
+                <div class="drop-zone" [class.dragging]="customersDragging" (dragover)="onDragOver($event, 'customers')"
+                    (dragleave)="onDragLeave($event, 'customers')" (drop)="onDrop($event, 'customers')">
+
+                    <div class="upload-icon">
+                        <svg viewBox="0 0 24 24" fill="none" class="custom-icon" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
+
+                    <div class="upload-text">
+                        <h3>Drag & Drop</h3>
+                        <p>or click to browse</p>
+                        <p class="requirements">Requires: customerid</p>
+                    </div>
+
+                    <input type="file" #customersInput (change)="onFileSelected($event, 'customers')" accept=".csv,.txt"
+                        class="hidden-input" />
+                    <button class="btn btn-browse" (click)="customersInput.click()">Browse File</button>
+                </div>
+
+                <div class="status-section" *ngIf="customersFile">
+                    <div class="file-info">
+                        <span class="file-name" [title]="customersFile.name">📄 {{ customersFile.name }}</span>
+                        <span class="status-badge" [ngClass]="customersStatus">
+                            {{ customersStatus === 'valid' ? '✅ Ready' : customersStatus === 'invalid' ? '❌ Invalid' :
+                            '⏳ Scanning...' }}
+                        </span>
+                    </div>
+                    <div class="error-msg" *ngIf="customersError">{{ customersError }}</div>
+                </div>
+            </div>
+
+            <!-- Transactions Upload Zone -->
+            <div class="upload-column">
+                <h2 class="zone-title">2. Transactions Data</h2>
+                <div class="format-selector">
+                    <label>Delimiter:</label>
+                    <select [(ngModel)]="transactionsDelimiter" (change)="onDelimiterChange('transactions')">
+                        <option value=",">Comma (CSV/TXT)</option>
+                        <option value="\t">Tab (TSV/TXT)</option>
+                    </select>
+                </div>
+
+                <div class="drop-zone" [class.dragging]="transactionsDragging"
+                    (dragover)="onDragOver($event, 'transactions')" (dragleave)="onDragLeave($event, 'transactions')"
+                    (drop)="onDrop($event, 'transactions')">
+
+                    <div class="upload-icon">
+                        <svg viewBox="0 0 24 24" fill="none" class="custom-icon" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                            <line x1="2" y1="10" x2="22" y2="10"></line>
+                        </svg>
+                    </div>
+
+                    <div class="upload-text">
+                        <h3>Drag & Drop</h3>
+                        <p>or click to browse</p>
+                        <p class="requirements">Requires: customerid, transactiondate, transactionvalue</p>
+                    </div>
+
+                    <input type="file" #transactionsInput (change)="onFileSelected($event, 'transactions')"
+                        accept=".csv,.txt" class="hidden-input" />
+                    <button class="btn btn-browse" (click)="transactionsInput.click()">Browse File</button>
+                </div>
+
+                <div class="status-section" *ngIf="transactionsFile">
+                    <div class="file-info">
+                        <span class="file-name" [title]="transactionsFile.name">📄 {{ transactionsFile.name }}</span>
+                        <span class="status-badge" [ngClass]="transactionsStatus">
+                            {{ transactionsStatus === 'valid' ? '✅ Ready' : transactionsStatus === 'invalid' ? '❌
+                            Invalid' : '⏳ Scanning...' }}
+                        </span>
+                    </div>
+                    <div class="error-msg" *ngIf="transactionsError">{{ transactionsError }}</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Templates Section -->
+        <div class="templates">
+            <p>Need help formatting?</p>
+            <div class="template-links">
+                <a href="#" class="template-link" (click)="$event.preventDefault()">Download Customers Template</a>
+                <span class="divider">|</span>
+                <a href="#" class="template-link" (click)="$event.preventDefault()">Download Transactions Template</a>
+            </div>
+        </div>
+
+        <!-- Predict Action -->
+        <button class="btn btn-predict"
+            [disabled]="customersStatus !== 'valid' || transactionsStatus !== 'valid' || isPredicting"
+            (click)="startPrediction()">
+            <span *ngIf="!isPredicting">Predict CLV Now</span>
+            <span *ngIf="isPredicting" class="spinner"></span>
+            <span *ngIf="isPredicting">&nbsp;Processing Data via ML Model...</span>
+        </button>
     </div>
 </div>

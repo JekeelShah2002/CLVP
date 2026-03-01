@@ -8,6 +8,7 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../app/core/auth.service';
 import { NotificationService } from '../../app/core/notification.service';
+import { LoaderService } from '../../app/core/loader.service';
 
 @Component({
   selector: 'app-signup',
@@ -21,6 +22,7 @@ export class SignupComponent {
   private auth = inject(AuthService);
   private router = inject(Router);
   private ns = inject(NotificationService);
+  private loader = inject(LoaderService);
 
   isSubmitting = false;
   showPassword = false;
@@ -45,6 +47,7 @@ export class SignupComponent {
     }
 
     this.isSubmitting = true;
+    this.loader.show();
 
     const { name, email, password } = this.form.getRawValue();
 
@@ -60,6 +63,7 @@ export class SignupComponent {
       this.ns.error(msg);
     } finally {
       this.isSubmitting = false;
+      this.loader.hide();
     }
   }
 }

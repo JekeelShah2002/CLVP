@@ -1,14 +1,11 @@
-<app-navbar></app-navbar>
-<app-toast></app-toast>
-<div class='box'>
-  <div class='wave -one'></div>
-  <div class='wave -two'></div>
-  <div class='wave -three'></div>
+<div class="min-h-screen flex flex-col relative">
+    <app-navbar class="sticky top-0 z-50 block w-full"></app-navbar>
+    <app-toast></app-toast>
+
+    <div class="flex-1 flex flex-col">
+        <router-outlet></router-outlet>
+    </div>
+
+    <app-footer></app-footer>
+    <app-loader></app-loader>
 </div>
-
-
-<router-outlet />
-
-
-
-<!-- <router-outlet></router-outlet> -->
