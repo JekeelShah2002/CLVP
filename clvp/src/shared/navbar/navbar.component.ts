@@ -1,6 +1,8 @@
 import { Component, computed, inject, OnInit, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { filter, map } from 'rxjs/operators';
 
 import { AuthService } from '../../app/core/auth.service';
 import { NotificationService } from '../../app/core/notification.service';
@@ -24,6 +26,17 @@ export class NavbarComponent implements OnInit {
     return user ? (user.name || user.email || 'Account').trim() : '';
   });
 
+  // Track current URL to toggle between Login/Signup buttons
+  private currentUrl = toSignal(
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+      map(event => event.urlAfterRedirects)
+    ),
+    { initialValue: this.router.url }
+  );
+
+  isLoginPage = computed(() => this.currentUrl()?.includes('/login'));
+
   isDropdownOpen = false;
 
   ngOnInit(): void {
@@ -37,11 +50,9 @@ export class NavbarComponent implements OnInit {
 
   @HostListener('document:click', ['$event'])
   clickout(event: Event) {
-    // If the click is inside the host element (our complete navbar dropdown), do nothing
     if (this.eRef.nativeElement.contains(event.target)) {
       return;
     }
-    // If the click is outside, close the dropdown
     if (this.isDropdownOpen) {
       this.isDropdownOpen = false;
     }
@@ -49,6 +60,10 @@ export class NavbarComponent implements OnInit {
 
   goToLogin() {
     this.router.navigateByUrl('/login');
+  }
+
+  goToSignup() {
+    this.router.navigateByUrl('/register');
   }
 
   async logout() {
@@ -61,3 +76,4 @@ export class NavbarComponent implements OnInit {
     }
   }
 }
+

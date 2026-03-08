@@ -32,11 +32,19 @@
 
   <div class="flex items-center">
     <!-- When NOT logged in -->
-    <button *ngIf="!isLoggedIn()" (click)="goToLogin()"
-      class="px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm font-semibold text-white transition-colors"
-      type="button">
-      Login / Signup
-    </button>
+    <ng-container *ngIf="!isLoggedIn()">
+      <button *ngIf="!isLoginPage()" (click)="goToLogin()"
+        class="px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm font-semibold text-white transition-colors"
+        type="button">
+        Login
+      </button>
+
+      <button *ngIf="isLoginPage()" (click)="goToSignup()"
+        class="px-5 py-2.5 bg-primary hover:bg-primary/90 rounded-xl text-sm font-semibold text-white transition-colors shadow-lg shadow-primary/20"
+        type="button">
+        Sign Up
+      </button>
+    </ng-container>
 
     <!-- When logged in -->
     <div *ngIf="isLoggedIn()" class="relative">
