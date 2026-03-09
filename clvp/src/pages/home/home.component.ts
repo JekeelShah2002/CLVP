@@ -12,7 +12,7 @@ type ValidationStatus = 'pending' | 'scanning' | 'valid' | 'invalid';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, TitleCasePipe, NgClass, FormsModule],
+  imports: [CommonModule, NgClass, FormsModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
@@ -22,7 +22,17 @@ export class HomeComponent {
   private ns = inject(NotificationService);
   private router = inject(Router);
 
-  isPredicting = false;
+  currentStep = 1;
+  
+  // Step 1
+  selectedIntegration: string | null = null;
+  
+  // Step 2
+  selectedGoal: string | null = null;
+  
+  // Step 3
+  analysisProgress = 0;
+  analysisStatus: 'pending' | 'processing' | 'complete' = 'pending';
 
   // Customers State
   customersFile: File | null = null;
@@ -37,6 +47,66 @@ export class HomeComponent {
   transactionsStatus: ValidationStatus = 'pending';
   transactionsError: string | null = null;
   transactionsDragging = false;
+
+  // Step Navigation
+  goToStep(step: number) {
+    if (step === 2) {
+      if (this.selectedIntegration !== 'csv') {
+        this.ns.error('Only Custom CSV Upload is fully supported at this time.');
+        return;
+      }
+      if (this.customersStatus !== 'valid' || this.transactionsStatus !== 'valid') {
+        this.ns.error('Please upload valid Customer and Transaction CSVs to continue.');
+        return;
+      }
+    }
+    
+    if (step === 3) {
+      if (!this.selectedGoal) {
+        this.ns.error('Please select a primary goal to continue.');
+        return;
+      }
+      this.currentStep = 3;
+      this.startAnalysis();
+      return;
+    }
+    
+    this.currentStep = step;
+  }
+
+  selectIntegration(integration: string) {
+    if (integration === 'csv') {
+      // Toggle visibility
+      this.selectedIntegration = this.selectedIntegration === 'csv' ? null : 'csv';
+    }
+  }
+
+  selectGoal(goal: string) {
+    this.selectedGoal = goal;
+  }
+
+  startAnalysis() {
+    this.analysisStatus = 'processing';
+    this.analysisProgress = 0;
+    
+    const interval = setInterval(() => {
+      // Random progression
+      this.analysisProgress += Math.floor(Math.random() * 8) + 2; 
+      
+      if (this.analysisProgress >= 100) {
+        this.analysisProgress = 100;
+        this.analysisStatus = 'complete';
+        clearInterval(interval);
+      }
+    }, 800);
+  }
+
+  goToDashboard() {
+    if (this.analysisStatus === 'complete') {
+      this.ns.success('Prediction complete! Generation dashboard...');
+      this.router.navigate(['/dashboard']);
+    }
+  }
 
   onDragOver(event: DragEvent, type: 'customers' | 'transactions') {
     event.preventDefault();
@@ -73,7 +143,6 @@ export class HomeComponent {
   }
 
   onDelimiterChange(type: 'customers' | 'transactions') {
-    // Re-validate file if it's already uploaded and we changed the delimiter
     const file = type === 'customers' ? this.customersFile : this.transactionsFile;
     if (file) {
       this.validateFile(file, type);
@@ -114,17 +183,5 @@ export class HomeComponent {
     } else {
       this.ns.error(`${type} validation failed.`);
     }
-  }
-
-  async startPrediction() {
-    if (this.customersStatus !== 'valid' || this.transactionsStatus !== 'valid') return;
-
-    this.isPredicting = true;
-
-    setTimeout(() => {
-      this.isPredicting = false;
-      this.ns.success('Prediction complete! Generating dashboard...');
-      this.router.navigate(['/dashboard']);
-    }, 3000);
   }
 }

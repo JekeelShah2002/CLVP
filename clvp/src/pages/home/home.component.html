@@ -1,129 +1,476 @@
-<div id="bg-wrap"></div>
+<div [ngClass]="{'step-1-bg': currentStep === 1, 'step-2-bg': currentStep === 2, 'step-3-bg': currentStep === 3}"
+    class="min-h-screen flex items-center justify-center relative w-full flex-col">
 
-<div class="stage">
-    <div class="card" role="region" aria-labelledby="homeTitle">
-        <div class="neon-corner" aria-hidden="true"></div>
-
-        <div class="header">
-            <h1 id="homeTitle">Welcome, {{ (auth.currentUser()?.name || auth.currentUser()?.email || 'Guest') |
-                titlecase }}</h1>
-            <p class="subtitle">Upload your historical data to generate intelligent CLV predictions</p>
-        </div>
-
-        <div class="upload-grid">
-
-            <!-- Customers Upload Zone -->
-            <div class="upload-column">
-                <h2 class="zone-title">1. Customers Data</h2>
-                <div class="format-selector">
-                    <label>Delimiter:</label>
-                    <select [(ngModel)]="customersDelimiter" (change)="onDelimiterChange('customers')">
-                        <option value=",">Comma (CSV/TXT)</option>
-                        <option value="\t">Tab (TSV/TXT)</option>
-                    </select>
+    <!-- ==== STEP 1 ==== -->
+    <div *ngIf="currentStep === 1"
+        class="relative z-10 w-full max-w-2xl glass-modal rounded-2xl overflow-hidden p-6 my-10 border border-white/5">
+        <div class="px-4 md:px-10 pt-10 pb-2">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex flex-col">
+                    <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-400/80">Step 1 of 3</span>
+                    <h2 class="text-xs font-medium text-slate-400 mt-0.5">Integration Setup</h2>
                 </div>
-
-                <div class="drop-zone" [class.dragging]="customersDragging" (dragover)="onDragOver($event, 'customers')"
-                    (dragleave)="onDragLeave($event, 'customers')" (drop)="onDrop($event, 'customers')">
-
-                    <div class="upload-icon">
-                        <svg viewBox="0 0 24 24" fill="none" class="custom-icon" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="9" cy="7" r="4"></circle>
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                        </svg>
-                    </div>
-
-                    <div class="upload-text">
-                        <h3>Drag & Drop</h3>
-                        <p>or click to browse</p>
-                        <p class="requirements">Requires: customerid</p>
-                    </div>
-
-                    <input type="file" #customersInput (change)="onFileSelected($event, 'customers')" accept=".csv,.txt"
-                        class="hidden-input" />
-                    <button class="btn btn-browse" (click)="customersInput.click()">Browse File</button>
-                </div>
-
-                <div class="status-section" *ngIf="customersFile">
-                    <div class="file-info">
-                        <span class="file-name" [title]="customersFile.name">📄 {{ customersFile.name }}</span>
-                        <span class="status-badge" [ngClass]="customersStatus">
-                            {{ customersStatus === 'valid' ? '✅ Ready' : customersStatus === 'invalid' ? '❌ Invalid' :
-                            '⏳ Scanning...' }}
-                        </span>
-                    </div>
-                    <div class="error-msg" *ngIf="customersError">{{ customersError }}</div>
+                <div class="text-right">
+                    <span class="text-xs font-semibold text-white">33% Complete</span>
                 </div>
             </div>
-
-            <!-- Transactions Upload Zone -->
-            <div class="upload-column">
-                <h2 class="zone-title">2. Transactions Data</h2>
-                <div class="format-selector">
-                    <label>Delimiter:</label>
-                    <select [(ngModel)]="transactionsDelimiter" (change)="onDelimiterChange('transactions')">
-                        <option value=",">Comma (CSV/TXT)</option>
-                        <option value="\t">Tab (TSV/TXT)</option>
-                    </select>
-                </div>
-
-                <div class="drop-zone" [class.dragging]="transactionsDragging"
-                    (dragover)="onDragOver($event, 'transactions')" (dragleave)="onDragLeave($event, 'transactions')"
-                    (drop)="onDrop($event, 'transactions')">
-
-                    <div class="upload-icon">
-                        <svg viewBox="0 0 24 24" fill="none" class="custom-icon" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="2" y="5" width="20" height="14" rx="2"></rect>
-                            <line x1="2" y1="10" x2="22" y2="10"></line>
-                        </svg>
-                    </div>
-
-                    <div class="upload-text">
-                        <h3>Drag & Drop</h3>
-                        <p>or click to browse</p>
-                        <p class="requirements">Requires: customerid, transactiondate, transactionvalue</p>
-                    </div>
-
-                    <input type="file" #transactionsInput (change)="onFileSelected($event, 'transactions')"
-                        accept=".csv,.txt" class="hidden-input" />
-                    <button class="btn btn-browse" (click)="transactionsInput.click()">Browse File</button>
-                </div>
-
-                <div class="status-section" *ngIf="transactionsFile">
-                    <div class="file-info">
-                        <span class="file-name" [title]="transactionsFile.name">📄 {{ transactionsFile.name }}</span>
-                        <span class="status-badge" [ngClass]="transactionsStatus">
-                            {{ transactionsStatus === 'valid' ? '✅ Ready' : transactionsStatus === 'invalid' ? '❌
-                            Invalid' : '⏳ Scanning...' }}
-                        </span>
-                    </div>
-                    <div class="error-msg" *ngIf="transactionsError">{{ transactionsError }}</div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Templates Section -->
-        <div class="templates">
-            <p>Need help formatting?</p>
-            <div class="template-links">
-                <a href="#" class="template-link" (click)="$event.preventDefault()">Download Customers Template</a>
-                <span class="divider">|</span>
-                <a href="#" class="template-link" (click)="$event.preventDefault()">Download Transactions Template</a>
+            <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full transition-all duration-700 ease-out"
+                    style="width: 33.33%;"></div>
             </div>
         </div>
 
-        <!-- Predict Action -->
-        <button class="btn btn-predict"
-            [disabled]="customersStatus !== 'valid' || transactionsStatus !== 'valid' || isPredicting"
-            (click)="startPrediction()">
-            <span *ngIf="!isPredicting">Predict CLV Now</span>
-            <span *ngIf="isPredicting" class="spinner"></span>
-            <span *ngIf="isPredicting">&nbsp;Processing Data via ML Model...</span>
-        </button>
+        <div class="px-4 md:px-10 py-8">
+            <h1 class="text-4xl font-bold tracking-tight text-white mb-3">Connect Your Data</h1>
+            <p class="text-slate-400 text-lg font-light leading-relaxed max-w-lg">Select a primary data source to begin
+                building your predictive Customer Lifetime Value models.</p>
+        </div>
+
+        <div class="px-4 md:px-10 pb-10">
+            <div class="grid grid-cols-1 gap-3">
+                <button
+                    class="group flex items-center gap-5 p-5 rounded-xl premium-card text-left disabled cursor-not-allowed border border-white/5">
+                    <div class="flex items-center justify-center w-14 h-14 rounded-xl icon-box shadow-inner">
+                        <span
+                            class="material-symbols-outlined text-blue-400 text-3xl opacity-90 transition-transform">monitoring</span>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-semibold text-white text-base">Google Analytics 4</h3>
+                        <p class="text-sm text-slate-500 transition-colors">Import behavior, events, and conversion
+                            data. <span class="text-blue-400 text-xs ml-1">(Coming Soon)</span></p>
+                    </div>
+                    <div class="text-slate-600 transition-colors">
+                        <span class="material-symbols-outlined">arrow_forward_ios</span>
+                    </div>
+                </button>
+                <button
+                    class="group flex items-center gap-5 p-5 rounded-xl premium-card text-left disabled cursor-not-allowed border border-white/5">
+                    <div class="flex items-center justify-center w-14 h-14 rounded-xl icon-box shadow-inner">
+                        <span
+                            class="material-symbols-outlined text-blue-400 text-3xl opacity-90 transition-transform">shopping_cart</span>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-semibold text-white text-base">Shopify</h3>
+                        <p class="text-sm text-slate-500 transition-colors">Sync customers, orders, and product
+                            catalogs. <span class="text-blue-400 text-xs ml-1">(Coming Soon)</span></p>
+                    </div>
+                    <div class="text-slate-600 transition-colors">
+                        <span class="material-symbols-outlined">arrow_forward_ios</span>
+                    </div>
+                </button>
+                <button
+                    class="group flex items-center gap-5 p-5 rounded-xl premium-card text-left disabled cursor-not-allowed border border-white/5">
+                    <div class="flex items-center justify-center w-14 h-14 rounded-xl icon-box shadow-inner">
+                        <span
+                            class="material-symbols-outlined text-blue-400 text-3xl opacity-90 transition-transform">hub</span>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-semibold text-white text-base">Salesforce</h3>
+                        <p class="text-sm text-slate-500 transition-colors">Connect CRM data for enterprise-level
+                            predictions. <span class="text-blue-400 text-xs ml-1">(Coming Soon)</span></p>
+                    </div>
+                    <div class="text-slate-600 transition-colors">
+                        <span class="material-symbols-outlined">arrow_forward_ios</span>
+                    </div>
+                </button>
+                <button (click)="selectIntegration('csv')"
+                    [ngClass]="{'border-blue-500 bg-blue-500/5': selectedIntegration === 'csv', 'border-slate-700 hover:border-slate-500': selectedIntegration !== 'csv'}"
+                    class="group flex items-center gap-5 p-5 rounded-xl border border-dashed bg-transparent hover:bg-white/5 transition-all text-left mt-2">
+                    <div class="flex items-center justify-center w-14 h-14 rounded-xl">
+                        <span class="material-symbols-outlined text-3xl"
+                            [ngClass]="{'text-blue-400': selectedIntegration === 'csv', 'text-slate-500': selectedIntegration !== 'csv'}">upload_file</span>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-medium group-hover:text-slate-300"
+                            [ngClass]="{'text-white': selectedIntegration === 'csv', 'text-slate-400': selectedIntegration !== 'csv'}">
+                            Custom CSV Upload</h3>
+                        <p class="text-xs"
+                            [ngClass]="{'text-slate-400': selectedIntegration === 'csv', 'text-slate-600': selectedIntegration !== 'csv'}">
+                            Securely upload manual datasets.</p>
+                    </div>
+                </button>
+
+                <!-- CSV Upload Dropzones -->
+                <div *ngIf="selectedIntegration === 'csv'"
+                    class="mt-4 p-5 bg-black/20 rounded-xl border border-white/5 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Customers Upload Zone -->
+                    <div class="flex flex-col gap-2">
+                        <h2 class="text-white text-sm font-semibold">1. Customer Loyalty Data</h2>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="text-xs text-slate-400">Delimiter:</label>
+                            <select [(ngModel)]="customersDelimiter" (change)="onDelimiterChange('customers')"
+                                class="bg-black/30 border border-white/10 text-white text-xs p-1 rounded outline-none h-7">
+                                <option value=",">Comma (CSV/TXT)</option>
+                                <option value="\t">Tab (TSV/TXT)</option>
+                            </select>
+                        </div>
+                        <div class="drop-zone border-2 border-dashed border-white/10 rounded-xl p-6 flex flex-col items-center justify-center hover:bg-white/5 transition-all text-center h-48 cursor-pointer relative"
+                            [class.border-blue-500]="customersDragging" [class.bg-blue-500_5]="customersDragging"
+                            (dragover)="onDragOver($event, 'customers')" (dragleave)="onDragLeave($event, 'customers')"
+                            (drop)="onDrop($event, 'customers')" (click)="customersInput.click()">
+                            <span class="material-symbols-outlined text-blue-400 text-3xl mb-2">group</span>
+                            <h3 class="text-white text-sm font-medium">Drag & Drop</h3>
+                            <p class="text-slate-500 text-xs mt-1">or click to browse</p>
+                            <p class="text-slate-500 text-[10px] mt-3 bg-black/40 px-2 py-1 rounded">Requires: ContactId
+                            </p>
+                            <input type="file" #customersInput (change)="onFileSelected($event, 'customers')"
+                                accept=".csv,.txt" class="hidden-input" />
+                        </div>
+                        <!-- Status section -->
+                        <div *ngIf="customersFile"
+                            class="mt-2 p-3 bg-black/30 rounded-lg border border-white/5 flex flex-col gap-1 text-xs">
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-300 truncate max-w-[120px]" [title]="customersFile.name">{{
+                                    customersFile.name }}</span>
+                                <span class="px-2 py-0.5 rounded font-bold"
+                                    [ngClass]="{'bg-green-500/20 text-green-400': customersStatus === 'valid', 'bg-red-500/20 text-red-400': customersStatus === 'invalid', 'bg-yellow-500/20 text-yellow-400': customersStatus === 'pending' || customersStatus === 'scanning'}">
+                                    {{ customersStatus === 'valid' ? 'Ready' : customersStatus === 'invalid' ? 'Invalid'
+                                    : 'Scanning...' }}
+                                </span>
+                            </div>
+                            <div class="text-red-400 text-[10px] mt-1" *ngIf="customersError">{{ customersError }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Transactions Upload Zone -->
+                    <div class="flex flex-col gap-2">
+                        <h2 class="text-white text-sm font-semibold">2. Online Purchases Data</h2>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="text-xs text-slate-400">Delimiter:</label>
+                            <select [(ngModel)]="transactionsDelimiter" (change)="onDelimiterChange('transactions')"
+                                class="bg-black/30 border border-white/10 text-white text-xs p-1 rounded outline-none h-7">
+                                <option value=",">Comma (CSV/TXT)</option>
+                                <option value="\t">Tab (TSV/TXT)</option>
+                            </select>
+                        </div>
+                        <div class="drop-zone border-2 border-dashed border-white/10 rounded-xl p-6 flex flex-col items-center justify-center hover:bg-white/5 transition-all text-center h-48 cursor-pointer relative"
+                            [class.border-blue-500]="transactionsDragging" [class.bg-blue-500_5]="transactionsDragging"
+                            (dragover)="onDragOver($event, 'transactions')"
+                            (dragleave)="onDragLeave($event, 'transactions')" (drop)="onDrop($event, 'transactions')"
+                            (click)="transactionsInput.click()">
+                            <span class="material-symbols-outlined text-blue-400 text-3xl mb-2">receipt_long</span>
+                            <h3 class="text-white text-sm font-medium">Drag & Drop</h3>
+                            <p class="text-slate-500 text-xs mt-1">or click to browse</p>
+                            <p class="text-slate-500 text-[10px] mt-3 bg-black/40 px-2 py-1 rounded">Req: ContactId,
+                                PurchasedOn, TotalPrice</p>
+                            <input type="file" #transactionsInput (change)="onFileSelected($event, 'transactions')"
+                                accept=".csv,.txt" class="hidden-input" />
+                        </div>
+                        <!-- Status section -->
+                        <div *ngIf="transactionsFile"
+                            class="mt-2 p-3 bg-black/30 rounded-lg border border-white/5 flex flex-col gap-1 text-xs">
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-300 truncate max-w-[120px]" [title]="transactionsFile.name">{{
+                                    transactionsFile.name }}</span>
+                                <span class="px-2 py-0.5 rounded font-bold"
+                                    [ngClass]="{'bg-green-500/20 text-green-400': transactionsStatus === 'valid', 'bg-red-500/20 text-red-400': transactionsStatus === 'invalid', 'bg-yellow-500/20 text-yellow-400': transactionsStatus === 'pending' || transactionsStatus === 'scanning'}">
+                                    {{ transactionsStatus === 'valid' ? 'Ready' : transactionsStatus === 'invalid' ?
+                                    'Invalid' : 'Scanning...' }}
+                                </span>
+                            </div>
+                            <div class="text-red-400 text-[10px] mt-1" *ngIf="transactionsError">{{ transactionsError }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="px-4 md:px-10 py-6 bg-black/20 border-t border-white/5 flex justify-between items-center">
+            <button
+                class="text-slate-400 hover:text-white text-sm font-medium transition-colors flex items-center gap-2">
+                <span class="material-symbols-outlined text-lg">close</span>
+                Cancel
+            </button>
+            <button (click)="goToStep(2)"
+                [disabled]="selectedIntegration !== 'csv' || customersStatus !== 'valid' || transactionsStatus !== 'valid'"
+                [ngClass]="{'opacity-50 cursor-not-allowed': selectedIntegration !== 'csv' || customersStatus !== 'valid' || transactionsStatus !== 'valid', 'hover:bg-blue-500 active:scale-95': selectedIntegration === 'csv' && customersStatus === 'valid' && transactionsStatus === 'valid'}"
+                class="group inline-flex items-center justify-center gap-2 px-10 py-3.5 bg-blue-600 text-white font-bold rounded-lg transition-all shadow-xl shadow-blue-900/20 border border-blue-500/50">
+                <span>Next Step</span>
+                <span
+                    class="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">chevron_right</span>
+            </button>
+        </div>
     </div>
+
+    <!-- STEP 2 -->
+    <div *ngIf="currentStep === 2" class="flex flex-1 justify-center py-16 px-6 relative w-full z-10 my-auto">
+        <div class="flex flex-col w-full max-w-[1100px] flex-1">
+            <div class="glass-panel rounded-3xl p-8 md:p-12 shadow-2xl">
+                <div class="flex flex-col gap-4 w-full max-w-2xl mx-auto mb-16">
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <p class="text-blue-500 text-xs font-bold uppercase tracking-[0.2em] mb-1">Step 2 of 3</p>
+                            <h3 class="text-white text-lg font-semibold mt-1">Goal Definition</h3>
+                        </div>
+                        <p class="text-slate-400 text-sm font-medium">66% Complete</p>
+                    </div>
+                    <div class="h-1.5 w-full rounded-full bg-white/5 overflow-hidden border border-white/5">
+                        <div class="h-full rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)] transition-all duration-700"
+                            style="width: 66%;"></div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-4 text-center max-w-3xl mx-auto mb-16">
+                    <h1 class="text-white text-4xl font-extrabold leading-tight tracking-tight md:text-5xl">What is your
+                        primary goal?</h1>
+                    <p class="text-slate-400 text-lg leading-relaxed">
+                        Our AI engine optimizes predictions based on your core objectives. Choose the path that defines
+                        your growth strategy.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div (click)="selectGoal('high_value')"
+                        [ngClass]="{'border-blue-500 bg-blue-500/10 active-glow': selectedGoal === 'high_value', 'border-white/5 bg-slate-900/40 hover:border-blue-500/50 card-glow': selectedGoal !== 'high_value'}"
+                        class="group relative flex flex-col gap-6 p-8 rounded-2xl border transition-all cursor-pointer">
+                        <div class="size-14 rounded-xl flex items-center justify-center transition-transform w-[56px] h-[56px]"
+                            [ngClass]="{'bg-blue-500 text-white shadow-lg shadow-blue-500/30': selectedGoal === 'high_value', 'bg-blue-500/10 text-blue-500 group-hover:scale-110': selectedGoal !== 'high_value'}">
+                            <span class="material-symbols-outlined text-3xl">loyalty</span>
+                        </div>
+                        <div class="flex flex-col gap-3">
+                            <h3 class="text-white text-xl font-bold tracking-tight">Predict High-Value Customers</h3>
+                            <p class="text-sm leading-relaxed"
+                                [ngClass]="{'text-slate-200/80': selectedGoal === 'high_value', 'text-slate-400': selectedGoal !== 'high_value'}">
+                                Identify users with the highest long-term potential and focus retention efforts where
+                                they matter most.</p>
+                        </div>
+                        <div class="absolute top-6 right-6 transition-opacity"
+                            [ngClass]="{'opacity-100': selectedGoal === 'high_value', 'opacity-0 group-hover:opacity-100': selectedGoal !== 'high_value'}">
+                            <span class="material-symbols-outlined text-blue-500">{{ selectedGoal === 'high_value' ?
+                                'check_circle' : 'circle' }}</span>
+                        </div>
+                    </div>
+
+                    <div (click)="selectGoal('reduce_churn')"
+                        [ngClass]="{'border-blue-500 bg-blue-500/10 active-glow': selectedGoal === 'reduce_churn', 'border-white/5 bg-slate-900/40 hover:border-blue-500/50 card-glow': selectedGoal !== 'reduce_churn'}"
+                        class="group relative flex flex-col gap-6 p-8 rounded-2xl border transition-all cursor-pointer">
+                        <div class="size-14 rounded-xl flex items-center justify-center transition-transform w-[56px] h-[56px]"
+                            [ngClass]="{'bg-blue-500 text-white shadow-lg shadow-blue-500/30': selectedGoal === 'reduce_churn', 'bg-blue-500/10 text-blue-500 group-hover:scale-110': selectedGoal !== 'reduce_churn'}">
+                            <span class="material-symbols-outlined text-3xl">person_remove</span>
+                        </div>
+                        <div class="flex flex-col gap-3">
+                            <h3 class="text-white text-xl font-bold tracking-tight">Reduce Churn</h3>
+                            <p class="text-sm leading-relaxed"
+                                [ngClass]="{'text-slate-200/80': selectedGoal === 'reduce_churn', 'text-slate-400': selectedGoal !== 'reduce_churn'}">
+                                Pinpoint at-risk customers before they leave using predictive behavioral triggers and
+                                engagement scorecards.</p>
+                        </div>
+                        <div class="absolute top-6 right-6 transition-opacity"
+                            [ngClass]="{'opacity-100': selectedGoal === 'reduce_churn', 'opacity-0 group-hover:opacity-100': selectedGoal !== 'reduce_churn'}">
+                            <span class="material-symbols-outlined text-blue-500">{{ selectedGoal === 'reduce_churn' ?
+                                'check_circle' : 'circle' }}</span>
+                        </div>
+                    </div>
+
+                    <div (click)="selectGoal('optimize_spend')"
+                        [ngClass]="{'border-blue-500 bg-blue-500/10 active-glow': selectedGoal === 'optimize_spend', 'border-white/5 bg-slate-900/40 hover:border-blue-500/50 card-glow': selectedGoal !== 'optimize_spend'}"
+                        class="group relative flex flex-col gap-6 p-8 rounded-2xl border transition-all cursor-pointer">
+                        <div class="size-14 rounded-xl flex items-center justify-center transition-transform w-[56px] h-[56px]"
+                            [ngClass]="{'bg-blue-500 text-white shadow-lg shadow-blue-500/30': selectedGoal === 'optimize_spend', 'bg-blue-500/10 text-blue-500 group-hover:scale-110': selectedGoal !== 'optimize_spend'}">
+                            <span class="material-symbols-outlined text-3xl">payments</span>
+                        </div>
+                        <div class="flex flex-col gap-3">
+                            <h3 class="text-white text-xl font-bold tracking-tight">Optimize Marketing Spend</h3>
+                            <p class="text-sm leading-relaxed"
+                                [ngClass]="{'text-slate-200/80': selectedGoal === 'optimize_spend', 'text-slate-400': selectedGoal !== 'optimize_spend'}">
+                                Allocate budget to channels with the highest projected ROI based on predictive customer
+                                cohorts.</p>
+                        </div>
+                        <div class="absolute top-6 right-6 transition-opacity"
+                            [ngClass]="{'opacity-100': selectedGoal === 'optimize_spend', 'opacity-0 group-hover:opacity-100': selectedGoal !== 'optimize_spend'}">
+                            <span class="material-symbols-outlined text-blue-500">{{ selectedGoal === 'optimize_spend' ?
+                                'check_circle' : 'circle' }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row justify-center items-center gap-6 mt-16">
+                    <button (click)="goToStep(1)"
+                        class="flex min-w-[160px] cursor-pointer items-center justify-center rounded-xl h-14 px-8 border border-white/10 text-slate-300 text-base font-bold transition-all hover:bg-white/5 hover:text-white">
+                        <span>Go Back</span>
+                    </button>
+                    <button (click)="goToStep(3)" [disabled]="!selectedGoal"
+                        [ngClass]="{'opacity-50 cursor-not-allowed': !selectedGoal, 'hover:bg-blue-600 hover:scale-[1.02] active:scale-95': selectedGoal}"
+                        class="flex min-w-[280px] cursor-pointer items-center justify-center rounded-xl h-14 px-8 bg-blue-500 text-white text-base font-bold shadow-xl shadow-blue-500/25 transition-all outline-none">
+                        <span>Continue to Step 3</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="mt-12 flex justify-center opacity-40">
+                <div class="flex items-center gap-2 text-slate-500 text-xs tracking-widest uppercase">
+                    <span class="w-8 h-px bg-slate-700"></span>
+                    <span>Enterprise Grade Security</span>
+                    <span class="w-8 h-px bg-slate-700"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div *ngIf="currentStep === 3" class="geometric-overlay z-0"></div>
+    <main *ngIf="currentStep === 3"
+        class="flex flex-1 justify-center py-16 px-6 md:px-20 lg:px-40 relative z-10 w-full my-auto">
+        <div class="flex flex-col w-full max-w-[1000px] flex-1">
+            <nav class="flex flex-wrap items-center gap-3 mb-10">
+                <a class="text-slate-500 text-sm font-medium hover:text-emerald-400 flex items-center gap-2 transition-colors"
+                    href="#" (click)="$event.preventDefault()">
+                    <span class="material-symbols-outlined text-base text-emerald-500/80">check_circle</span>
+                    Data Mapping
+                </a>
+                <span class="text-slate-700 text-[10px] font-bold">/</span>
+                <span class="text-electric-blue text-sm font-bold flex items-center gap-2">
+                    <span class="material-symbols-outlined text-base">pending</span>
+                    Analysis Setup
+                </span>
+            </nav>
+
+            <div class="flex flex-col gap-4 mb-12">
+                <div class="flex items-center">
+                    <span
+                        class="bg-electric-blue/10 border border-electric-blue/30 text-electric-blue text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-[0.2em]">Step
+                        3 of 3</span>
+                </div>
+                <h1 class="text-white text-4xl md:text-5xl font-extrabold leading-[1.15] tracking-tight">Analyzing Your
+                    Customer Data</h1>
+                <p class="text-slate-400 text-lg md:text-xl font-normal leading-relaxed max-w-2xl">Sit tight! We're
+                    processing your historical transaction data to generate high-precision CLV predictions and churn
+                    risk models.</p>
+            </div>
+
+            <div class="glass-card p-8 md:p-12 rounded-[2rem] mb-12 relative overflow-hidden shadow-2xl">
+                <div
+                    class="absolute -top-24 -right-24 h-64 w-64 bg-electric-blue/10 blur-[100px] rounded-full pointer-events-none">
+                </div>
+
+                <div class="absolute top-0 right-0 p-6">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-2 w-2" *ngIf="analysisStatus === 'processing'">
+                            <span
+                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-electric-blue opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-electric-blue"></span>
+                        </span>
+                        <span class="material-symbols-outlined text-electric-blue text-[12px]"
+                            *ngIf="analysisStatus === 'complete'">check_circle</span>
+                        <span class="text-slate-500 text-[10px] font-mono uppercase tracking-widest">{{ analysisStatus
+                            === 'complete' ? 'Processing Complete' : 'Processing Core Model' }}</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-12 relative z-10">
+                    <div class="flex flex-col md:flex-row items-center gap-10">
+                        <div class="relative flex items-center justify-center">
+                            <svg class="w-40 h-40 transform -rotate-90">
+                                <circle class="text-white/5" cx="80" cy="80" fill="transparent" r="72"
+                                    stroke="currentColor" stroke-width="8"></circle>
+                                <circle class="text-electric-blue transition-all duration-300 ease-out"
+                                    style="filter: drop-shadow(0 0 8px rgba(0,212,255,0.6))" cx="80" cy="80"
+                                    fill="transparent" r="72" stroke="currentColor" [attr.stroke-dasharray]="452.39"
+                                    [attr.stroke-dashoffset]="452.39 - (analysisProgress / 100) * 452.39"
+                                    stroke-linecap="round" stroke-width="8"></circle>
+                            </svg>
+                            <div class="absolute flex flex-col items-center">
+                                <span
+                                    class="text-4xl font-black text-white tracking-tighter">{{analysisProgress}}%</span>
+                                <span class="text-[10px] text-slate-500 font-bold uppercase">{{analysisStatus ===
+                                    'complete' ? 'Done' : 'Complete'}}</span>
+                            </div>
+                        </div>
+
+                        <div class="text-center md:text-left flex-1">
+                            <h3 class="text-white text-3xl font-bold mb-3">{{ analysisStatus === 'complete' ? 'Analysis
+                                Complete' : 'Processing Segments' }}</h3>
+                            <p class="text-slate-400 text-lg mb-6 leading-relaxed">Deep learning models are identifying
+                                high-value cohorts and behavioral patterns across your dataset.</p>
+                            <div class="flex flex-wrap items-center justify-center md:justify-start gap-6 text-sm">
+                                <span class="text-slate-500 font-medium flex items-center gap-2"
+                                    *ngIf="analysisStatus !== 'complete'">
+                                    <span class="material-symbols-outlined text-lg">schedule</span>
+                                    Est. {{ (100 - analysisProgress) / 5 | number:'1.0-0' }}s remaining
+                                </span>
+                                <span
+                                    class="flex items-center gap-2 text-electric-blue font-bold px-3 py-1 bg-electric-blue/10 rounded-lg border border-electric-blue/20"
+                                    *ngIf="analysisStatus !== 'complete'">
+                                    <span class="h-1.5 w-1.5 rounded-full bg-electric-blue"></span>
+                                    LIVE ANALYSIS
+                                </span>
+                                <span
+                                    class="flex items-center gap-2 text-emerald-400 font-bold px-3 py-1 bg-emerald-400/10 rounded-lg border border-emerald-400/20"
+                                    *ngIf="analysisStatus === 'complete'">
+                                    <span class="material-symbols-outlined text-sm">task_alt</span>
+                                    ANALYSIS FINISHED
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-end px-1">
+                            <span class="text-slate-300 text-sm font-bold uppercase tracking-widest">Overall
+                                Optimization</span>
+                            <span class="text-electric-blue font-mono text-xl font-bold">{{ analysisProgress |
+                                number:'1.1-1' }}%</span>
+                        </div>
+                        <div class="w-full bg-white/5 rounded-full h-5 p-1 border border-white/5 relative">
+                            <div class="bg-gradient-to-r from-blue-500 to-electric-blue h-full rounded-full transition-all duration-300 ease-out relative overflow-hidden"
+                                [style.width.%]="analysisProgress" style="box-shadow: 0 0 20px rgba(0,212,255,0.5)">
+                                <div class="absolute inset-0 bg-white/20 animate-pulse"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-8 border-t border-white/5">
+                        <div
+                            class="flex items-center gap-4 text-emerald-400 bg-emerald-400/5 px-5 py-4 rounded-xl border border-emerald-400/10">
+                            <span class="material-symbols-outlined text-2xl">check_circle</span>
+                            <span class="text-sm font-bold uppercase tracking-wide">Data Ingested</span>
+                        </div>
+                        <div
+                            class="flex items-center gap-4 text-emerald-400 bg-emerald-400/5 px-5 py-4 rounded-xl border border-emerald-400/10">
+                            <span class="material-symbols-outlined text-2xl">check_circle</span>
+                            <span class="text-sm font-bold uppercase tracking-wide">Normalization</span>
+                        </div>
+                        <div class="flex items-center gap-4 px-5 py-4 rounded-xl border"
+                            [ngClass]="{'text-electric-blue bg-electric-blue/5 border-electric-blue/20': analysisStatus !== 'complete', 'text-emerald-400 bg-emerald-400/5 border-emerald-400/10': analysisStatus === 'complete'}">
+                            <span class="material-symbols-outlined text-2xl"
+                                [class.animate-spin]="analysisStatus !== 'complete'">{{ analysisStatus === 'complete' ?
+                                'check_circle' : 'sync' }}</span>
+                            <span class="text-sm font-bold uppercase tracking-wide">CLV Prediction</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-16">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-8 pt-12 border-t border-white/5">
+                    <div class="text-slate-500 text-sm flex items-center gap-4 font-medium"
+                        *ngIf="analysisStatus !== 'complete'">
+                        <div class="flex gap-1.5">
+                            <div class="w-2 h-2 rounded-full bg-electric-blue/60 animate-pulse"></div>
+                            <div class="w-2 h-2 rounded-full bg-electric-blue/60 animate-pulse [animation-delay:200ms]">
+                            </div>
+                            <div class="w-2 h-2 rounded-full bg-electric-blue/60 animate-pulse [animation-delay:400ms]">
+                            </div>
+                        </div>
+                        Finalizing your personalized workspace...
+                    </div>
+                    <div class="text-emerald-400 text-sm flex items-center gap-4 font-medium"
+                        *ngIf="analysisStatus === 'complete'">
+                        <span class="material-symbols-outlined">rocket_launch</span>
+                        Dashboard is ready to view.
+                    </div>
+
+                    <button (click)="goToDashboard()" [disabled]="analysisStatus !== 'complete'"
+                        [ngClass]="{'cursor-not-allowed opacity-50 bg-white/5 text-white/40': analysisStatus !== 'complete', 'bg-electric-blue text-slate-900 hover:bg-blue-400': analysisStatus === 'complete'}"
+                        class="w-full sm:w-auto px-10 py-5 font-extrabold rounded-2xl flex items-center justify-center gap-3 border border-white/5 transition-all group overflow-hidden relative">
+                        Go to Dashboard
+                        <span class="material-symbols-outlined text-xl transition-transform"
+                            [class.group-hover:translate-x-1]="analysisStatus === 'complete'">arrow_forward</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
 </div>

@@ -30,10 +30,10 @@ export class FileService {
 
             let required: string[] = [];
             if (type === 'transactions') {
-                required = ['customerid', 'transactiondate', 'transactionvalue'];
+                required = ['contactid', 'purchasedon', 'totalprice'];
             } else if (type === 'customers') {
-                // We ensure customerid exists on the customers table
-                required = ['customerid'];
+                // We ensure contactid exists on the customers table
+                required = ['contactid'];
             }
 
             const missing = required.filter(req => !headers.includes(req));
