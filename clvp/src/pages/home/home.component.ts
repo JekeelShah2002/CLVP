@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule, TitleCasePipe, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -6,6 +6,8 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../app/core/auth.service';
 import { FileService, Delimiter } from '../../app/core/file.service';
 import { NotificationService } from '../../app/core/notification.service';
+import { ApiService } from '../../app/core/api.service';
+import { firstValueFrom } from 'rxjs';
 
 type ValidationStatus = 'pending' | 'scanning' | 'valid' | 'invalid';
 
@@ -16,20 +18,23 @@ type ValidationStatus = 'pending' | 'scanning' | 'valid' | 'invalid';
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   public auth = inject(AuthService);
   private fileService = inject(FileService);
   private ns = inject(NotificationService);
   private router = inject(Router);
+  private api = inject(ApiService);
 
-  currentStep = 1;
-  
+  isLoading = true;
+  currentStep = 0;
+  hasExistingData = false;
+
   // Step 1
   selectedIntegration: string | null = null;
-  
+
   // Step 2
   selectedGoal: string | null = null;
-  
+
   // Step 3
   analysisProgress = 0;
   analysisStatus: 'pending' | 'processing' | 'complete' = 'pending';
@@ -49,6 +54,35 @@ export class HomeComponent {
   transactionsDragging = false;
 
   // Step Navigation
+  async ngOnInit() {
+    try {
+      const res = await firstValueFrom(this.api.getCustomers());
+      if (res && res.customers && res.customers.length > 0) {
+        this.hasExistingData = true;
+        this.currentStep = 0; // Dashboard Welcome Back
+      } else {
+        this.hasExistingData = false;
+        this.currentStep = 1; // Onboarding Setup
+      }
+    } catch (err) {
+      console.error(err);
+      this.hasExistingData = false;
+      this.currentStep = 1; // Default to onboarding on error
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  cancelUpload() {
+    if (this.hasExistingData) {
+      this.currentStep = 0;
+    }
+  }
+
+  startNewUpload() {
+    this.currentStep = 1;
+  }
+
   goToStep(step: number) {
     if (step === 2) {
       if (this.selectedIntegration !== 'csv') {
@@ -60,7 +94,7 @@ export class HomeComponent {
         return;
       }
     }
-    
+
     if (step === 3) {
       if (!this.selectedGoal) {
         this.ns.error('Please select a primary goal to continue.');
@@ -70,7 +104,7 @@ export class HomeComponent {
       this.startAnalysis();
       return;
     }
-    
+
     this.currentStep = step;
   }
 
@@ -85,20 +119,34 @@ export class HomeComponent {
     this.selectedGoal = goal;
   }
 
-  startAnalysis() {
+  async startAnalysis() {
     this.analysisStatus = 'processing';
     this.analysisProgress = 0;
-    
-    const interval = setInterval(() => {
-      // Random progression
-      this.analysisProgress += Math.floor(Math.random() * 8) + 2; 
-      
-      if (this.analysisProgress >= 100) {
-        this.analysisProgress = 100;
-        this.analysisStatus = 'complete';
-        clearInterval(interval);
-      }
-    }, 800);
+
+    if (!this.customersFile || !this.transactionsFile) return;
+
+    try {
+      // Step 1: Upload Demographics
+      this.analysisProgress = 10;
+      await firstValueFrom(this.api.uploadDemographics(this.customersFile));
+
+      // Step 2: Upload Transactions
+      this.analysisProgress = 40;
+      await firstValueFrom(this.api.uploadTransactions(this.transactionsFile));
+
+      // Step 3: Compute Features
+      this.analysisProgress = 70;
+      const res = await firstValueFrom(this.api.computeFeatures());
+
+      this.analysisProgress = 100;
+      this.analysisStatus = 'complete';
+      console.log('Features computed:', res);
+    } catch (err) {
+      console.error(err);
+      this.ns.error('Server error during analysis computation.');
+      this.analysisStatus = 'pending';
+      this.analysisProgress = 0;
+    }
   }
 
   goToDashboard() {

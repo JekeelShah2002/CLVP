@@ -21,7 +21,25 @@ export class AuthService {
       return true;
     } catch {
       this.currentUser.set(null);
+      this.cachedJwt = null; // Clear token if invalid
       return false;
+    }
+  }
+
+  private cachedJwt: string | null = null;
+  private jwtExpiresAt: number = 0;
+
+  async getJwt(): Promise<string | null> {
+    if (!this.currentUser()) return null; // Not logged in
+    if (this.cachedJwt && Date.now() < this.jwtExpiresAt) return this.cachedJwt;
+    try {
+      const { jwt } = await this.appwrite.account.createJWT();
+      this.cachedJwt = jwt;
+      // Appwrite JWTs normally last 15 mins, let's cache for 14 mins to be safe
+      this.jwtExpiresAt = Date.now() + 14 * 60 * 1000;
+      return jwt;
+    } catch {
+      return null;
     }
   }
 

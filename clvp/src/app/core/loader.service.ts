@@ -6,7 +6,7 @@ import { Injectable, signal } from '@angular/core';
 export class LoaderService {
   public isLoading = signal(false);
   private showTimestamp = 0;
-  private readonly MIN_LOADER_TIME_MS = 2000;
+  private readonly MIN_LOADER_TIME_MS = 1200;
 
   show() {
     this.showTimestamp = Date.now();
