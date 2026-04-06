@@ -38,6 +38,7 @@ export class NavbarComponent implements OnInit {
   isLoginPage = computed(() => this.currentUrl()?.includes('/login'));
 
   isDropdownOpen = false;
+  isMobileMenuOpen = false;
 
   ngOnInit(): void {
     // Initial fetch to load user context
@@ -48,6 +49,10 @@ export class NavbarComponent implements OnInit {
     this.isDropdownOpen = !this.isDropdownOpen;
   }
 
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  }
+
   @HostListener('document:click', ['$event'])
   clickout(event: Event) {
     if (this.eRef.nativeElement.contains(event.target)) {
@@ -55,6 +60,9 @@ export class NavbarComponent implements OnInit {
     }
     if (this.isDropdownOpen) {
       this.isDropdownOpen = false;
+    }
+    if (this.isMobileMenuOpen) {
+      this.isMobileMenuOpen = false;
     }
   }
 

@@ -14,12 +14,20 @@
   </div>
 </nav> -->
 
-<nav class="glass-panel flex items-center justify-between px-6 py-3 w-full backdrop-blur-md">
-  <div class="flex items-center gap-3 cursor-pointer" [routerLink]="isLoggedIn() ? '/home' : '/'">
-    <div class="flex items-center justify-center size-8 bg-primary rounded-xl text-white shadow-lg shadow-primary/30">
-      <span class="material-symbols-outlined text-2xl">analytics</span>
+<nav class="glass-panel flex items-center justify-between px-6 py-3 w-full backdrop-blur-md relative z-40">
+  <div class="flex items-center gap-3">
+    <!-- Hamburger button (Mobile only) -->
+    <button (click)="toggleMobileMenu()" class="md:hidden flex items-center justify-center p-2 text-slate-300 hover:text-white transition-colors rounded-lg hover:bg-white/10" type="button">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+    
+    <div class="flex items-center gap-3 cursor-pointer" [routerLink]="isLoggedIn() ? '/home' : '/'">
+      <div class="flex items-center justify-center size-8 bg-primary rounded-xl text-white shadow-lg shadow-primary/30">
+        <span class="material-symbols-outlined text-2xl">analytics</span>
+      </div>
+      <span class="text-white text-xl font-bold tracking-tight pointer-events-none hidden sm:block">CLV Prediction Platform</span>
+      <span class="text-white text-xl font-bold tracking-tight pointer-events-none sm:hidden">CLV Platform</span>
     </div>
-    <span class="text-white text-xl font-bold tracking-tight pointer-events-none">CLV Prediction Platform</span>
   </div>
 
   <ul class="hidden md:flex items-center gap-8 text-sm font-medium">
@@ -28,7 +36,7 @@
     <li><a routerLink="/docs" class="text-slate-300 hover:text-white hover:text-primary transition-colors cursor-pointer">Docs</a></li>
   </ul>
 
-  <div class="flex items-center">
+  <div class="hidden md:flex items-center">
     <!-- When NOT logged in -->
     <ng-container *ngIf="!isLoggedIn()">
       <button *ngIf="!isLoginPage()" (click)="goToLogin()"
@@ -67,3 +75,79 @@
     </div>
   </div>
 </nav>
+
+<!-- Mobile Off-Canvas Sidebar Menu -->
+<div class="fixed inset-0 z-50 md:hidden transition-opacity duration-300"
+     [class.opacity-100]="isMobileMenuOpen" [class.pointer-events-auto]="isMobileMenuOpen"
+     [class.opacity-0]="!isMobileMenuOpen" [class.pointer-events-none]="!isMobileMenuOpen">
+  
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" (click)="toggleMobileMenu()"></div>
+
+  <!-- Sidebar Menu Container -->
+  <div class="absolute top-0 left-0 bottom-0 w-[280px] max-w-[80vw] bg-slate-950/95 border-r border-white/10 shadow-2xl transition-transform duration-300 transform flex flex-col"
+       [class.translate-x-0]="isMobileMenuOpen" [class.-translate-x-full]="!isMobileMenuOpen">
+    
+    <div class="flex items-center justify-between p-5 border-b border-white/10">
+      <div class="flex items-center gap-3">
+        <div class="flex items-center justify-center size-8 bg-primary rounded-xl text-white shadow-lg shadow-primary/30">
+          <span class="material-symbols-outlined text-[20px]">analytics</span>
+        </div>
+        <span class="text-white text-lg font-bold tracking-tight">CLV Platform</span>
+      </div>
+      <button (click)="toggleMobileMenu()" class="p-2 text-slate-400 hover:text-white transition-colors rounded-lg hover:bg-white/5" type="button">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <!-- Mobile Nav Links -->
+    <div class="flex-1 overflow-y-auto py-4 px-3 flex flex-col gap-1">
+      <a (click)="toggleMobileMenu()" [routerLink]="isLoggedIn() ? '/home' : '/'" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-white/5 hover:text-white transition-all font-medium">
+        <span class="material-symbols-outlined text-[20px]">home</span>
+        Home
+      </a>
+      <a (click)="toggleMobileMenu()" routerLink="/customers" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-white/5 hover:text-white transition-all font-medium">
+        <span class="material-symbols-outlined text-[20px]">group</span>
+        Customers
+      </a>
+      <a (click)="toggleMobileMenu()" routerLink="/docs" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-white/5 hover:text-white transition-all font-medium">
+        <span class="material-symbols-outlined text-[20px]">description</span>
+        Docs
+      </a>
+    </div>
+
+    <!-- Auth Actions inside Mobile Menu -->
+    <div class="p-4 border-t border-white/10 flex flex-col gap-3">
+      <!-- When NOT logged in -->
+      <ng-container *ngIf="!isLoggedIn()">
+        <button *ngIf="!isLoginPage()" (click)="goToLogin(); toggleMobileMenu()"
+          class="w-full px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm font-semibold text-white transition-colors"
+          type="button">
+          Login
+        </button>
+        <button *ngIf="isLoginPage()" (click)="goToSignup(); toggleMobileMenu()"
+          class="w-full px-5 py-3 bg-primary hover:bg-primary/90 rounded-xl text-sm font-semibold text-white transition-colors shadow-lg shadow-primary/20"
+          type="button">
+          Sign Up
+        </button>
+      </ng-container>
+
+      <!-- When logged in -->
+      <div *ngIf="isLoggedIn()" class="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-4">
+        <div class="flex items-center gap-3">
+          <div class="size-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-lg">
+            {{ userName().charAt(0).toUpperCase() }}
+          </div>
+          <div class="flex flex-col overflow-hidden">
+            <span class="text-[11px] text-slate-400 uppercase tracking-wider font-semibold">Account</span>
+            <span class="text-white text-sm font-semibold truncate">{{ userName() }}</span>
+          </div>
+        </div>
+        <button (click)="logout(); toggleMobileMenu()" class="w-full px-4 py-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 hover:text-red-400 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 border border-red-500/20" type="button">
+          <span class="material-symbols-outlined text-[18px]">logout</span>
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
