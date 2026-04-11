@@ -8,6 +8,7 @@ import { CustomersComponent } from '../pages/customers/customers.component';
 import { DocsComponent } from '../pages/docs/docs.component';
 import { PageNotFoundComponent } from './pages/page-not-found/page-not-found.component';
 import { LandingComponent } from '../pages/landing/landing.component';
+import { CustomerDetailComponent } from '../pages/customer-detail/customer-detail.component';
 
 export const routes: Routes = [
   { path: '', component: LandingComponent, pathMatch: 'full' },
@@ -17,5 +18,6 @@ export const routes: Routes = [
   { path: 'docs', component: DocsComponent },
   { path: 'home', component: HomeComponent, canActivate: [authGuard] },
   { path: 'customers', component: CustomersComponent, canActivate: [authGuard] },
+  { path: 'customers/:id', component: CustomerDetailComponent, canActivate: [authGuard] },
   { path: '**', component: PageNotFoundComponent },
 ];

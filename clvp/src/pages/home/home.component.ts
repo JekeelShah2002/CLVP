@@ -7,6 +7,7 @@ import { AuthService } from '../../app/core/auth.service';
 import { FileService, Delimiter } from '../../app/core/file.service';
 import { NotificationService } from '../../app/core/notification.service';
 import { ApiService } from '../../app/core/api.service';
+import { LoaderService } from '../../app/core/loader.service';
 import { firstValueFrom } from 'rxjs';
 
 type ValidationStatus = 'pending' | 'scanning' | 'valid' | 'invalid';
@@ -24,8 +25,8 @@ export class HomeComponent implements OnInit {
   private ns = inject(NotificationService);
   private router = inject(Router);
   private api = inject(ApiService);
+  private loader = inject(LoaderService);
 
-  isLoading = true;
   currentStep = 0;
   hasExistingData = false;
 
@@ -55,6 +56,7 @@ export class HomeComponent implements OnInit {
 
   // Step Navigation
   async ngOnInit() {
+    this.loader.show();
     try {
       const res = await firstValueFrom(this.api.getCustomers());
       if (res && res.customers && res.customers.length > 0) {
@@ -69,7 +71,7 @@ export class HomeComponent implements OnInit {
       this.hasExistingData = false;
       this.currentStep = 1; // Default to onboarding on error
     } finally {
-      this.isLoading = false;
+      this.loader.hide();
     }
   }
 

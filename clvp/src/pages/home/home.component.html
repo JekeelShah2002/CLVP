@@ -1,18 +1,8 @@
 <div [ngClass]="{'step-0-bg': currentStep === 0, 'step-1-bg': currentStep === 1, 'step-2-bg': currentStep === 2, 'step-3-bg': currentStep === 3}"
     class="min-h-screen flex items-center justify-center relative w-full flex-col">
 
-    <!-- Loading State -->
-    <div *ngIf="isLoading" class="flex flex-col items-center justify-center w-full z-10 h-full flex-1 min-h-[60vh]">
-        <div class="relative flex h-16 w-16 items-center justify-center mb-6">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-20"></span>
-            <span class="relative inline-flex rounded-full h-12 w-12 bg-blue-600/80 border border-blue-400"></span>
-            <span class="material-symbols-outlined absolute text-white text-lg">sync</span>
-        </div>
-        <h2 class="text-white text-xl font-semibold tracking-tight animate-pulse">Checking workspace...</h2>
-    </div>
-
     <!-- Dashboard / Welcome Back (Step 0) -->
-    <div *ngIf="!isLoading && currentStep === 0" class="flex flex-1 justify-center py-16 px-6 relative w-full z-10 my-auto animate-fade-in">
+    <div *ngIf="currentStep === 0" class="flex flex-1 justify-center py-16 px-6 relative w-full z-10 my-auto animate-fade-in">
         <div class="flex flex-col w-full max-w-[900px] flex-1">
             <div class="glass-panel rounded-[2rem] p-8 md:p-14 shadow-2xl relative overflow-hidden border border-white/5 bg-slate-900/60 backdrop-blur-xl">
                 <!-- Ambient glow -->
@@ -75,7 +65,7 @@
     </div>
 
     <!-- ==== STEP 1 ==== -->
-    <div *ngIf="!isLoading && currentStep === 1"
+    <div *ngIf="currentStep === 1"
         class="relative z-10 w-full max-w-2xl glass-modal rounded-2xl overflow-hidden p-6 my-10 border border-white/5">
         <div class="px-4 md:px-10 pt-10 pb-2">
             <div class="flex items-center justify-between mb-4">
@@ -270,7 +260,7 @@
     </div>
 
     <!-- STEP 2 -->
-    <div *ngIf="!isLoading && currentStep === 2" class="flex flex-1 justify-center py-16 px-6 relative w-full z-10 my-auto">
+    <div *ngIf="currentStep === 2" class="flex flex-1 justify-center py-16 px-6 relative w-full z-10 my-auto">
         <div class="flex flex-col w-full max-w-[1100px] flex-1">
             <div class="glass-panel rounded-3xl p-8 md:p-12 shadow-2xl">
                 <div class="flex flex-col gap-4 w-full max-w-2xl mx-auto mb-16">
@@ -385,8 +375,8 @@
     </div>
 
     <!-- STEP 3 -->
-    <div *ngIf="!isLoading && currentStep === 3" class="geometric-overlay z-0"></div>
-    <main *ngIf="!isLoading && currentStep === 3"
+    <div *ngIf="currentStep === 3" class="geometric-overlay z-0"></div>
+    <main *ngIf="currentStep === 3"
         class="flex flex-1 justify-center py-16 px-6 md:px-20 lg:px-40 relative z-10 w-full my-auto">
         <div class="flex flex-col w-full max-w-[1000px] flex-1">
             <nav class="flex flex-wrap items-center gap-3 mb-10">

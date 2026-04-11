@@ -1,0 +1,158 @@
+<div class="min-h-screen pt-24 px-6 md:px-12 bg-[#070b14] flex flex-col items-center pb-20">
+    <div class="w-full max-w-7xl flex items-center justify-between border-b border-white/5 pb-6 mb-8">
+        <div class="flex items-center gap-4">
+            <button routerLink="/customers" class="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-300 transition-colors">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </button>
+            <div>
+                <h1 class="text-white text-3xl font-extrabold tracking-tight">Customer Profile</h1>
+                <p class="text-slate-400 text-sm mt-1">ID: {{ customerId }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="w-full max-w-7xl bg-red-500/10 border border-red-500/20 text-red-400 px-6 py-4 rounded-xl mb-8 flex items-center gap-3">
+        <span class="material-symbols-outlined text-2xl">error</span>
+        {{ error }}
+    </div>
+
+    <div *ngIf="customerData" class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Sidebar: Demographics & Quick Stats -->
+        <div class="lg:col-span-4 flex flex-col gap-6">
+            <!-- Profile Card -->
+            <div class="bg-slate-900/60 border border-white/5 shadow-2xl rounded-2xl p-8 relative overflow-hidden backdrop-blur-xl">
+                <div class="absolute -top-16 -right-16 w-32 h-32 bg-blue-500/20 rounded-full blur-[50px]"></div>
+                
+                <div class="flex items-center gap-5 mb-8 relative z-10">
+                    <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold text-2xl shadow-lg ring-4 ring-slate-900">
+                        {{ customerData.demographics?.FullName ? customerData.demographics.FullName.charAt(0).toUpperCase() : (customerData.demographics?.FirstName ? customerData.demographics.FirstName.charAt(0).toUpperCase() : '?') }}
+                    </div>
+                    <div>
+                        <h2 class="text-white font-bold text-xl">{{ customerData.demographics?.FullName || customerData.demographics?.FirstName || 'Unknown User' }}</h2>
+                        <span class="text-xs font-semibold px-2.5 py-1 bg-white/10 text-slate-200 rounded-md uppercase tracking-wider inline-block mt-2">
+                            Loyalty ID: {{ customerData.demographics?.LoyaltyId || 'N/A' }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-4 relative z-10 text-sm">
+                    <div class="flex justify-between border-b border-white/5 pb-3">
+                        <span class="text-slate-500">Email</span>
+                        <span class="text-slate-200">{{ customerData.demographics?.EMail || '-' }}</span>
+                    </div>
+                    <div class="flex justify-between border-b border-white/5 pb-3">
+                        <span class="text-slate-500">Phone</span>
+                        <span class="text-slate-200">{{ customerData.demographics?.Telephone || '-' }}</span>
+                    </div>
+                    <div class="flex justify-between border-b border-white/5 pb-3">
+                        <span class="text-slate-500">Gender</span>
+                        <span class="text-slate-200">{{ customerData.demographics?.Gender || '-' | titlecase }}</span>
+                    </div>
+                    <div class="flex justify-between border-b border-white/5 pb-3">
+                        <span class="text-slate-500">DOB</span>
+                        <span class="text-slate-200">{{ customerData.demographics?.DateOfBirth || '-' }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500 text-yellow-500/80">Rewards Balance</span>
+                        <span class="font-bold text-yellow-400">{{ customerData.demographics?.RewardPoints || 0 | number }} PTS</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features Summary -->
+            <div *ngIf="customerData.features" class="grid grid-cols-2 gap-4">
+                <div class="bg-slate-900/40 p-5 rounded-2xl border border-white/5 shadow-lg">
+                    <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Total Value</p>
+                    <p class="text-emerald-400 font-bold text-xl">{{ customerData.features.total_transaction_value | currency }}</p>
+                </div>
+                <div class="bg-slate-900/40 p-5 rounded-2xl border border-white/5 shadow-lg">
+                    <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Avg Order</p>
+                    <p class="text-white font-bold text-xl">{{ customerData.features.average_order_value | currency }}</p>
+                </div>
+                <div class="bg-slate-900/40 p-5 rounded-2xl border border-white/5 shadow-lg">
+                    <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Frequency</p>
+                    <p class="text-blue-400 font-bold text-xl">{{ customerData.features.frequency | number:'1.1-2' }} <span class="text-xs font-normal">/mo</span></p>
+                </div>
+                <div class="bg-slate-900/40 p-5 rounded-2xl border border-white/5 shadow-lg">
+                    <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Tenure</p>
+                    <p class="text-white font-bold text-xl">{{ customerData.features.customer_tenure_days }} <span class="text-xs font-normal">days</span></p>
+                </div>
+            </div>
+            
+            <div *ngIf="!customerData.features && customerData.transactions?.length > 0" class="bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-xl text-yellow-500 text-xs">
+                Models have not fully computed aggregate features for this user yet.
+            </div>
+        </div>
+
+        <!-- Main Content: Charts & Timeline -->
+        <div class="lg:col-span-8 flex flex-col gap-6">
+            
+            <div *ngIf="customerData.transactions?.length === 0" class="bg-slate-900/30 border border-white/5 rounded-2xl p-16 flex flex-col items-center justify-center text-center">
+                 <span class="material-symbols-outlined text-5xl text-slate-600 mb-4">receipt_long</span>
+                 <h3 class="text-white text-xl font-bold mb-2">No Transactions Found</h3>
+                 <p class="text-slate-400 text-sm max-w-md">This customer has demographic records but no linked purchasing history.</p>
+            </div>
+
+            <!-- Visualizations Grid -->
+            <ng-container *ngIf="customerData.transactions?.length > 0">
+                <!-- Top Main Chart -->
+                <div class="bg-slate-900/50 border border-white/5 rounded-2xl p-6 shadow-xl backdrop-blur-sm">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-white font-semibold flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-500"></span>Purchase Value Over Time</h3>
+                    </div>
+                    <div class="w-full h-64 relative">
+                        <canvas #lineChart></canvas>
+                    </div>
+                </div>
+
+                <!-- Three smaller charts grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-slate-900/50 border border-white/5 rounded-2xl p-6 shadow-xl">
+                        <h3 class="text-white text-sm font-semibold mb-4 text-center">Monthly Spend</h3>
+                        <div class="w-full h-48 relative"><canvas #barChart></canvas></div>
+                    </div>
+                    <div class="bg-slate-900/50 border border-white/5 rounded-2xl p-6 shadow-xl">
+                        <h3 class="text-white text-sm font-semibold mb-4 text-center">Order Value Distribution</h3>
+                        <div class="w-full h-48 relative"><canvas #distChart></canvas></div>
+                    </div>
+                    <div class="bg-slate-900/50 border border-white/5 rounded-2xl p-6 shadow-xl flex flex-col items-center">
+                        <h3 class="text-white text-sm font-semibold mb-2 text-center">Activity Breakdown</h3>
+                        <div class="w-full h-48 relative flex justify-center"><canvas #doughnutChart></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Transaction Ledger Table -->
+                <div class="bg-slate-900/50 border border-white/5 rounded-2xl p-6 md:p-8 shadow-xl overflow-hidden mt-2">
+                    <h3 class="text-white font-semibold mb-6 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-slate-400">history</span>
+                        Transaction Ledger ({{ customerData.transactions.length }})
+                    </h3>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-slate-500 text-[10px] font-bold uppercase tracking-widest border-b border-white/10">
+                                    <th class="py-3 px-4 font-bold">Date</th>
+                                    <th class="py-3 px-4 font-bold">Receipt ID</th>
+                                    <th class="py-3 px-4 font-bold">Activity</th>
+                                    <th class="py-3 px-4 font-bold text-right">Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let tx of customerData.transactions" class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                    <td class="py-3 px-4 text-slate-300 text-sm">{{ tx.PurchasedOn | date:'mediumDate' }}</td>
+                                    <td class="py-3 px-4 text-slate-500 text-xs font-mono">{{ tx.transaction_id.substring(0, 12) }}...</td>
+                                    <td class="py-3 px-4 text-slate-400 text-xs">{{ tx.ActivityTypeDisplay || 'Order' }}</td>
+                                    <td class="py-3 px-4 text-emerald-400 font-semibold text-right text-sm">{{ tx.TotalPrice | currency }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </ng-container>
+
+        </div>
+    </div>
+</div>

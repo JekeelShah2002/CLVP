@@ -30,4 +30,8 @@ export class ApiService {
   getCustomers(query: string = ''): Observable<any> {
     return this.http.get(`${this.baseUrl}/customers?q=${encodeURIComponent(query)}`);
   }
+
+  getCustomerDetails(id: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/customers/${encodeURIComponent(id)}`);
+  }
 }
