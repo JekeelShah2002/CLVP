@@ -212,4 +212,9 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit, OnDestroy
           }));
       }
   }
+  /** Build a safe display string from optional city/state/country fields */
+  getLocation(dem: any): string {
+    if (!dem) return '-';
+    return [dem.City, dem.State, dem.Country].filter((v: any) => !!v).join(', ') || '-';
+  }
 }

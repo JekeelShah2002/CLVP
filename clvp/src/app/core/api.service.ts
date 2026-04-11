@@ -11,10 +11,16 @@ export class ApiService {
   private http = inject(HttpClient);
   private baseUrl = environment.apiUrl;
 
-  uploadDemographics(file: File): Observable<any> {
+  /** Upload Contact.txt (primary 3-file flow) */
+  uploadContacts(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http.post(`${this.baseUrl}/upload/demographics`, formData);
+    return this.http.post(`${this.baseUrl}/upload/contacts`, formData);
+  }
+
+  /** @deprecated Use uploadContacts() — kept for backward compatibility */
+  uploadDemographics(file: File): Observable<any> {
+    return this.uploadContacts(file);
   }
 
   uploadTransactions(file: File): Observable<any> {

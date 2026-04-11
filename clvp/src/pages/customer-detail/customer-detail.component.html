@@ -19,28 +19,37 @@
 
     <div *ngIf="customerData" class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        <!-- Sidebar: Demographics & Quick Stats -->
+        <!-- Sidebar: Contact Info & Quick Stats -->
         <div class="lg:col-span-4 flex flex-col gap-6">
             <!-- Profile Card -->
             <div class="bg-slate-900/60 border border-white/5 shadow-2xl rounded-2xl p-8 relative overflow-hidden backdrop-blur-xl">
                 <div class="absolute -top-16 -right-16 w-32 h-32 bg-blue-500/20 rounded-full blur-[50px]"></div>
                 
-                <div class="flex items-center gap-5 mb-8 relative z-10">
+                <div class="flex items-center gap-5 mb-6 relative z-10">
                     <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold text-2xl shadow-lg ring-4 ring-slate-900">
                         {{ customerData.demographics?.FullName ? customerData.demographics.FullName.charAt(0).toUpperCase() : (customerData.demographics?.FirstName ? customerData.demographics.FirstName.charAt(0).toUpperCase() : '?') }}
                     </div>
                     <div>
                         <h2 class="text-white font-bold text-xl">{{ customerData.demographics?.FullName || customerData.demographics?.FirstName || 'Unknown User' }}</h2>
-                        <span class="text-xs font-semibold px-2.5 py-1 bg-white/10 text-slate-200 rounded-md uppercase tracking-wider inline-block mt-2">
-                            Loyalty ID: {{ customerData.demographics?.LoyaltyId || 'N/A' }}
+                        <p class="text-slate-400 text-xs mt-0.5">{{ customerData.demographics?.Occupation || 'Occupation N/A' }}</p>
+                        <!-- Loyalty Tier Badge -->
+                        <span *ngIf="customerData.demographics?.LoyaltyTier"
+                            class="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-md uppercase tracking-wider mt-2"
+                            [ngClass]="{
+                                'bg-yellow-400/15 text-yellow-300 border border-yellow-400/30': customerData.demographics.LoyaltyTier.toLowerCase() === 'high',
+                                'bg-slate-400/15 text-slate-300 border border-slate-400/30': customerData.demographics.LoyaltyTier.toLowerCase() === 'medium',
+                                'bg-amber-700/20 text-amber-600 border border-amber-700/30': customerData.demographics.LoyaltyTier.toLowerCase() === 'low'
+                            }">
+                            <span class="material-symbols-outlined text-sm">star</span>
+                            {{ customerData.demographics.LoyaltyTier | titlecase }} Tier
                         </span>
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-4 relative z-10 text-sm">
+                <div class="flex flex-col gap-3 relative z-10 text-sm">
                     <div class="flex justify-between border-b border-white/5 pb-3">
                         <span class="text-slate-500">Email</span>
-                        <span class="text-slate-200">{{ customerData.demographics?.EMail || '-' }}</span>
+                        <span class="text-slate-200 text-right">{{ customerData.demographics?.EMail || '-' }}</span>
                     </div>
                     <div class="flex justify-between border-b border-white/5 pb-3">
                         <span class="text-slate-500">Phone</span>
@@ -54,9 +63,33 @@
                         <span class="text-slate-500">DOB</span>
                         <span class="text-slate-200">{{ customerData.demographics?.DateOfBirth || '-' }}</span>
                     </div>
+                    <div class="flex justify-between border-b border-white/5 pb-3">
+                        <span class="text-slate-500">Location</span>
+                        <span class="text-slate-200 text-right text-xs">
+                            {{ getLocation(customerData.demographics) }}
+                        </span>
+                    </div>
+                    <div class="flex justify-between border-b border-white/5 pb-3">
+                        <span class="text-slate-500">Post Code</span>
+                        <span class="text-slate-200">{{ customerData.demographics?.PostCode || '-' }}</span>
+                    </div>
+                    <div class="flex justify-between border-b border-white/5 pb-3">
+                        <span class="text-slate-500">Email Sub.</span>
+                        <span [ngClass]="{'text-emerald-400': customerData.demographics?.EmailSubscriber === 'Yes', 'text-slate-400': customerData.demographics?.EmailSubscriber !== 'Yes'}">
+                            {{ customerData.demographics?.EmailSubscriber || '-' }}
+                        </span>
+                    </div>
+                    <div class="flex justify-between border-b border-white/5 pb-3">
+                        <span class="text-slate-500">Income</span>
+                        <span class="text-slate-200">{{ customerData.demographics?.Income != null ? (customerData.demographics.Income | currency:'USD':'symbol':'1.0-0') : '-' }}</span>
+                    </div>
+                    <div class="flex justify-between border-b border-white/5 pb-3">
+                        <span class="text-slate-500">Satisfaction</span>
+                        <span class="text-slate-200 capitalize">{{ customerData.demographics?.CustomerSatisfaction || '-' }}</span>
+                    </div>
                     <div class="flex justify-between">
-                        <span class="text-slate-500 text-yellow-500/80">Rewards Balance</span>
-                        <span class="font-bold text-yellow-400">{{ customerData.demographics?.RewardPoints || 0 | number }} PTS</span>
+                        <span class="text-slate-500">Member Since</span>
+                        <span class="text-slate-200">{{ customerData.demographics?.CreatedOn || '-' }}</span>
                     </div>
                 </div>
             </div>
@@ -79,6 +112,25 @@
                     <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Tenure</p>
                     <p class="text-white font-bold text-xl">{{ customerData.features.customer_tenure_days }} <span class="text-xs font-normal">days</span></p>
                 </div>
+                <!-- Loyalty Tier Score -->
+                <div class="bg-slate-900/40 p-5 rounded-2xl border border-white/5 shadow-lg col-span-2">
+                    <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Loyalty Tier Score <span class="text-slate-600">(RFM)</span></p>
+                    <div class="flex items-center gap-3">
+                        <p class="font-bold text-xl"
+                            [ngClass]="{
+                                'text-yellow-400': customerData.features.loyalty_tier_score === 3,
+                                'text-slate-300': customerData.features.loyalty_tier_score === 2,
+                                'text-amber-700': customerData.features.loyalty_tier_score === 1,
+                                'text-slate-600': !customerData.features.loyalty_tier_score
+                            }">
+                            {{ customerData.features.loyalty_tier_score ?? 0 }} / 3
+                        </p>
+                        <div class="flex gap-1">
+                            <span *ngFor="let i of [1,2,3]" class="w-2 h-2 rounded-full"
+                                [ngClass]="customerData.features.loyalty_tier_score >= i ? 'bg-yellow-400' : 'bg-white/10'"></span>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <div *ngIf="!customerData.features && customerData.transactions?.length > 0" class="bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-xl text-yellow-500 text-xs">
@@ -92,7 +144,7 @@
             <div *ngIf="customerData.transactions?.length === 0" class="bg-slate-900/30 border border-white/5 rounded-2xl p-16 flex flex-col items-center justify-center text-center">
                  <span class="material-symbols-outlined text-5xl text-slate-600 mb-4">receipt_long</span>
                  <h3 class="text-white text-xl font-bold mb-2">No Transactions Found</h3>
-                 <p class="text-slate-400 text-sm max-w-md">This customer has demographic records but no linked purchasing history.</p>
+                 <p class="text-slate-400 text-sm max-w-md">This customer has contact records but no linked purchasing history.</p>
             </div>
 
             <!-- Visualizations Grid -->

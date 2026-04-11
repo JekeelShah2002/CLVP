@@ -156,42 +156,41 @@
                 <!-- CSV Upload Dropzones -->
                 <div *ngIf="selectedIntegration === 'csv'"
                     class="mt-4 p-5 bg-black/20 rounded-xl border border-white/5 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Customers Upload Zone -->
+                    <!-- Contacts Upload Zone (Contact.txt) -->
                     <div class="flex flex-col gap-2">
-                        <h2 class="text-white text-sm font-semibold">1. Customer Loyalty Data</h2>
+                        <h2 class="text-white text-sm font-semibold">1. Contact Data <span class="text-blue-400/70 font-mono text-[10px]">(Contact.txt)</span></h2>
                         <div class="flex items-center justify-between mb-2">
                             <label class="text-xs text-slate-400">Delimiter:</label>
-                            <select [(ngModel)]="customersDelimiter" (change)="onDelimiterChange('customers')"
+                            <select [(ngModel)]="contactsDelimiter" (change)="onDelimiterChange('contacts')"
                                 class="bg-black/30 border border-white/10 text-white text-xs p-1 rounded outline-none h-7">
                                 <option value=",">Comma (CSV/TXT)</option>
                                 <option value="\t">Tab (TSV/TXT)</option>
                             </select>
                         </div>
                         <div class="drop-zone border-2 border-dashed border-white/10 rounded-xl p-6 flex flex-col items-center justify-center hover:bg-white/5 transition-all text-center h-48 cursor-pointer relative"
-                            [class.border-blue-500]="customersDragging" [class.bg-blue-500_5]="customersDragging"
-                            (dragover)="onDragOver($event, 'customers')" (dragleave)="onDragLeave($event, 'customers')"
-                            (drop)="onDrop($event, 'customers')" (click)="customersInput.click()">
-                            <span class="material-symbols-outlined text-blue-400 text-3xl mb-2">group</span>
-                            <h3 class="text-white text-sm font-medium">Drag & Drop</h3>
+                            [class.border-blue-500]="contactsDragging" [class.bg-blue-500_5]="contactsDragging"
+                            (dragover)="onDragOver($event, 'contacts')" (dragleave)="onDragLeave($event, 'contacts')"
+                            (drop)="onDrop($event, 'contacts')" (click)="contactsInput.click()">
+                            <span class="material-symbols-outlined text-blue-400 text-3xl mb-2">contacts</span>
+                            <h3 class="text-white text-sm font-medium">Drag &amp; Drop</h3>
                             <p class="text-slate-500 text-xs mt-1">or click to browse</p>
-                            <p class="text-slate-500 text-[10px] mt-3 bg-black/40 px-2 py-1 rounded">Requires: ContactId
-                            </p>
-                            <input type="file" #customersInput (change)="onFileSelected($event, 'customers')"
+                            <p class="text-slate-500 text-[10px] mt-3 bg-black/40 px-2 py-1 rounded">Req: ContactId, Loyalty Tier</p>
+                            <input type="file" #contactsInput (change)="onFileSelected($event, 'contacts')"
                                 accept=".csv,.txt" class="hidden-input" />
                         </div>
                         <!-- Status section -->
-                        <div *ngIf="customersFile"
+                        <div *ngIf="contactsFile"
                             class="mt-2 p-3 bg-black/30 rounded-lg border border-white/5 flex flex-col gap-1 text-xs">
                             <div class="flex justify-between items-center">
-                                <span class="text-slate-300 truncate max-w-[120px]" [title]="customersFile.name">{{
-                                    customersFile.name }}</span>
+                                <span class="text-slate-300 truncate max-w-[120px]" [title]="contactsFile.name">{{
+                                    contactsFile.name }}</span>
                                 <span class="px-2 py-0.5 rounded font-bold"
-                                    [ngClass]="{'bg-green-500/20 text-green-400': customersStatus === 'valid', 'bg-red-500/20 text-red-400': customersStatus === 'invalid', 'bg-yellow-500/20 text-yellow-400': customersStatus === 'pending' || customersStatus === 'scanning'}">
-                                    {{ customersStatus === 'valid' ? 'Ready' : customersStatus === 'invalid' ? 'Invalid'
+                                    [ngClass]="{'bg-green-500/20 text-green-400': contactsStatus === 'valid', 'bg-red-500/20 text-red-400': contactsStatus === 'invalid', 'bg-yellow-500/20 text-yellow-400': contactsStatus === 'pending' || contactsStatus === 'scanning'}">
+                                    {{ contactsStatus === 'valid' ? 'Ready' : contactsStatus === 'invalid' ? 'Invalid'
                                     : 'Scanning...' }}
                                 </span>
                             </div>
-                            <div class="text-red-400 text-[10px] mt-1" *ngIf="customersError">{{ customersError }}</div>
+                            <div class="text-red-400 text-[10px] mt-1" *ngIf="contactsError">{{ contactsError }}</div>
                         </div>
                     </div>
 
@@ -249,8 +248,8 @@
                 Cancel
             </button>
             <button (click)="goToStep(2)"
-                [disabled]="selectedIntegration !== 'csv' || customersStatus !== 'valid' || transactionsStatus !== 'valid'"
-                [ngClass]="{'opacity-50 cursor-not-allowed': selectedIntegration !== 'csv' || customersStatus !== 'valid' || transactionsStatus !== 'valid', 'hover:bg-blue-500 active:scale-95': selectedIntegration === 'csv' && customersStatus === 'valid' && transactionsStatus === 'valid'}"
+                [disabled]="selectedIntegration !== 'csv' || contactsStatus !== 'valid' || transactionsStatus !== 'valid'"
+                [ngClass]="{'opacity-50 cursor-not-allowed': selectedIntegration !== 'csv' || contactsStatus !== 'valid' || transactionsStatus !== 'valid', 'hover:bg-blue-500 active:scale-95': selectedIntegration === 'csv' && contactsStatus === 'valid' && transactionsStatus === 'valid'}"
                 class="group inline-flex items-center justify-center gap-2 px-10 py-3.5 bg-blue-600 text-white font-bold rounded-lg transition-all shadow-xl shadow-blue-900/20 border border-blue-500/50">
                 <span>Next Step</span>
                 <span

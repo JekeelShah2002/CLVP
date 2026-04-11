@@ -30,7 +30,6 @@ export class AuthService {
   private jwtExpiresAt: number = 0;
 
   async getJwt(): Promise<string | null> {
-    if (!this.currentUser()) return null; // Not logged in
     if (this.cachedJwt && Date.now() < this.jwtExpiresAt) return this.cachedJwt;
     try {
       const { jwt } = await this.appwrite.account.createJWT();
@@ -51,23 +50,26 @@ export class AuthService {
   }
 
   async login(email: string, password: string) {
-    // Creates a session (cookie stored by Appwrite)
-    try {
-      await this.appwrite.account.deleteSession('current');
-    } catch {
-      // no active session, ignore
-    }
-
+    // Creates a new session (cookie stored by Appwrite)
     await this.appwrite.account.createEmailPasswordSession(email, password);
-    // Update the signal state
+    // Populate the user signal so guards and interceptors work immediately
     await this.isLoggedIn();
+    // Clear any stale cached JWT so the next request gets a fresh one
+    this.cachedJwt = null;
+    this.jwtExpiresAt = 0;
   }
 
   async logout() {
     // Delete "current session"
-    await this.appwrite.account.deleteSession('current');
-    // Clear user state
+    try {
+      await this.appwrite.account.deleteSession('current');
+    } catch {
+      // already logged out
+    }
+    // Clear all state
     this.currentUser.set(null);
+    this.cachedJwt = null;
+    this.jwtExpiresAt = 0;
     await this.router.navigate(['/login']);
   }
 }

@@ -40,12 +40,12 @@ export class HomeComponent implements OnInit {
   analysisProgress = 0;
   analysisStatus: 'pending' | 'processing' | 'complete' = 'pending';
 
-  // Customers State
-  customersFile: File | null = null;
-  customersDelimiter: Delimiter = ',';
-  customersStatus: ValidationStatus = 'pending';
-  customersError: string | null = null;
-  customersDragging = false;
+  // Contacts State (Contact.txt)
+  contactsFile: File | null = null;
+  contactsDelimiter: Delimiter = ',';
+  contactsStatus: ValidationStatus = 'pending';
+  contactsError: string | null = null;
+  contactsDragging = false;
 
   // Transactions State
   transactionsFile: File | null = null;
@@ -55,21 +55,43 @@ export class HomeComponent implements OnInit {
   transactionsDragging = false;
 
   // Step Navigation
+  private readonly DATA_FLAG_KEY = 'clvp_has_data';
+
   async ngOnInit() {
+    // Fast-path: if we've previously confirmed data exists, show welcome screen immediately
+    const hasFlag = localStorage.getItem(this.DATA_FLAG_KEY) === 'true';
+    if (hasFlag) {
+      this.hasExistingData = true;
+      this.currentStep = 0;
+    }
+
     this.loader.show();
     try {
       const res = await firstValueFrom(this.api.getCustomers());
       if (res && res.customers && res.customers.length > 0) {
         this.hasExistingData = true;
         this.currentStep = 0; // Dashboard Welcome Back
+        localStorage.setItem(this.DATA_FLAG_KEY, 'true');
       } else {
+        // Confirmed empty — clear flag and show onboarding
         this.hasExistingData = false;
-        this.currentStep = 1; // Onboarding Setup
+        this.currentStep = 1;
+        localStorage.removeItem(this.DATA_FLAG_KEY);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      this.hasExistingData = false;
-      this.currentStep = 1; // Default to onboarding on error
+      if (err?.status === 401) {
+        // Session expired — redirect to login
+        this.router.navigate(['/login']);
+      } else if (hasFlag) {
+        // API unreachable but we know data existed — stay on welcome screen
+        this.hasExistingData = true;
+        this.currentStep = 0;
+      } else {
+        // Unknown error, fresh user — show onboarding
+        this.hasExistingData = false;
+        this.currentStep = 1;
+      }
     } finally {
       this.loader.hide();
     }
@@ -91,8 +113,8 @@ export class HomeComponent implements OnInit {
         this.ns.error('Only Custom CSV Upload is fully supported at this time.');
         return;
       }
-      if (this.customersStatus !== 'valid' || this.transactionsStatus !== 'valid') {
-        this.ns.error('Please upload valid Customer and Transaction CSVs to continue.');
+      if (this.contactsStatus !== 'valid' || this.transactionsStatus !== 'valid') {
+        this.ns.error('Please upload valid Contact and Transaction files to continue.');
         return;
       }
     }
@@ -125,23 +147,24 @@ export class HomeComponent implements OnInit {
     this.analysisStatus = 'processing';
     this.analysisProgress = 0;
 
-    if (!this.customersFile || !this.transactionsFile) return;
+    if (!this.contactsFile || !this.transactionsFile) return;
 
     try {
-      // Step 1: Upload Demographics
+      // Step 1: Upload Contacts
       this.analysisProgress = 10;
-      await firstValueFrom(this.api.uploadDemographics(this.customersFile));
+      await firstValueFrom(this.api.uploadContacts(this.contactsFile));
 
       // Step 2: Upload Transactions
       this.analysisProgress = 40;
       await firstValueFrom(this.api.uploadTransactions(this.transactionsFile));
 
-      // Step 3: Compute Features
+      // Step 3: Compute Features (including loyalty_tier_score)
       this.analysisProgress = 70;
       const res = await firstValueFrom(this.api.computeFeatures());
 
       this.analysisProgress = 100;
       this.analysisStatus = 'complete';
+      localStorage.setItem(this.DATA_FLAG_KEY, 'true'); // Mark as returning user
       console.log('Features computed:', res);
     } catch (err) {
       console.error(err);
@@ -158,25 +181,25 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  onDragOver(event: DragEvent, type: 'customers' | 'transactions') {
+  onDragOver(event: DragEvent, type: 'contacts' | 'transactions') {
     event.preventDefault();
     event.stopPropagation();
-    if (type === 'customers') this.customersDragging = true;
+    if (type === 'contacts') this.contactsDragging = true;
     else this.transactionsDragging = true;
   }
 
-  onDragLeave(event: DragEvent, type: 'customers' | 'transactions') {
+  onDragLeave(event: DragEvent, type: 'contacts' | 'transactions') {
     event.preventDefault();
     event.stopPropagation();
-    if (type === 'customers') this.customersDragging = false;
+    if (type === 'contacts') this.contactsDragging = false;
     else this.transactionsDragging = false;
   }
 
-  onDrop(event: DragEvent, type: 'customers' | 'transactions') {
+  onDrop(event: DragEvent, type: 'contacts' | 'transactions') {
     event.preventDefault();
     event.stopPropagation();
 
-    if (type === 'customers') this.customersDragging = false;
+    if (type === 'contacts') this.contactsDragging = false;
     else this.transactionsDragging = false;
 
     const files = event.dataTransfer?.files;
@@ -185,51 +208,51 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  onFileSelected(event: any, type: 'customers' | 'transactions') {
+  onFileSelected(event: any, type: 'contacts' | 'transactions') {
     const file = event.target.files[0];
     if (file) {
       this.handleFile(file, type);
     }
   }
 
-  onDelimiterChange(type: 'customers' | 'transactions') {
-    const file = type === 'customers' ? this.customersFile : this.transactionsFile;
+  onDelimiterChange(type: 'contacts' | 'transactions') {
+    const file = type === 'contacts' ? this.contactsFile : this.transactionsFile;
     if (file) {
       this.validateFile(file, type);
     }
   }
 
-  handleFile(file: File, type: 'customers' | 'transactions') {
-    if (type === 'customers') {
-      this.customersFile = file;
+  handleFile(file: File, type: 'contacts' | 'transactions') {
+    if (type === 'contacts') {
+      this.contactsFile = file;
     } else {
       this.transactionsFile = file;
     }
     this.validateFile(file, type);
   }
 
-  async validateFile(file: File, type: 'customers' | 'transactions') {
-    if (type === 'customers') {
-      this.customersStatus = 'scanning';
-      this.customersError = null;
+  async validateFile(file: File, type: 'contacts' | 'transactions') {
+    if (type === 'contacts') {
+      this.contactsStatus = 'scanning';
+      this.contactsError = null;
     } else {
       this.transactionsStatus = 'scanning';
       this.transactionsError = null;
     }
 
-    const delimiter = type === 'customers' ? this.customersDelimiter : this.transactionsDelimiter;
+    const delimiter = type === 'contacts' ? this.contactsDelimiter : this.transactionsDelimiter;
     const result = await this.fileService.validateDataset(file, type, delimiter);
 
-    if (type === 'customers') {
-      this.customersStatus = result.isValid ? 'valid' : 'invalid';
-      this.customersError = result.error || null;
+    if (type === 'contacts') {
+      this.contactsStatus = result.isValid ? 'valid' : 'invalid';
+      this.contactsError = result.error || null;
     } else {
       this.transactionsStatus = result.isValid ? 'valid' : 'invalid';
       this.transactionsError = result.error || null;
     }
 
     if (result.isValid) {
-      this.ns.success(`${type} validated successfully!`);
+      this.ns.success(`${type} file validated successfully!`);
     } else {
       this.ns.error(`${type} validation failed.`);
     }

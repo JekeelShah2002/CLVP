@@ -12,7 +12,7 @@ export type Delimiter = ',' | '\t';
 export class FileService {
     constructor() { }
 
-    async validateDataset(file: File, type: 'customers' | 'transactions', delimiter: Delimiter): Promise<ValidationResult> {
+    async validateDataset(file: File, type: 'contacts' | 'transactions', delimiter: Delimiter): Promise<ValidationResult> {
         const ext = file.name.split('.').pop()?.toLowerCase();
         if (ext !== 'csv' && ext !== 'txt') {
             return { isValid: false, error: 'File must be a .csv or .txt format.' };
@@ -31,9 +31,14 @@ export class FileService {
             let required: string[] = [];
             if (type === 'transactions') {
                 required = ['contactid', 'purchasedon', 'totalprice'];
-            } else if (type === 'customers') {
-                // We ensure contactid exists on the customers table
+            } else if (type === 'contacts') {
+                // ContactId is the only hard requirement; Loyalty Tier is recommended but not blocking
                 required = ['contactid'];
+                // Soft warning for missing Loyalty Tier (non-blocking)
+                const hasLoyaltyTier = headers.includes('loyalty tier');
+                if (!hasLoyaltyTier) {
+                    console.warn('[FileService] "Loyalty Tier" column not found in Contact file — loyalty_tier_score will default to 0.');
+                }
             }
 
             const missing = required.filter(req => !headers.includes(req));
