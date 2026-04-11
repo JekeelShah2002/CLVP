@@ -10,11 +10,11 @@
             <h2 class="text-white text-2xl font-bold border-b border-white/10 pb-4 mb-6">How to use the ML Pipeline</h2>
             
             <ol class="list-decimal pl-5 space-y-4 text-slate-300">
-                <li><strong class="text-white">Prepare your three files:</strong> You need exactly <span class="text-yellow-400 font-semibold">three</span> separate spreadsheets:
-                    <span class="text-emerald-400">Contact Data</span> (Contact.txt),
-                    <span class="text-blue-400">Transactions</span>, and optionally a supplemental demographics file.
+                <li><strong class="text-white">Prepare your files:</strong> You need exactly <span class="text-yellow-400 font-semibold">two</span> separate spreadsheets:
+                    <span class="text-emerald-400">Contact Data</span>,
+                    <span class="text-blue-400">Transactions</span>
                     Make sure they strictly follow the required column names below.</li>
-                <li><strong class="text-white">Upload to Dashboard:</strong> Navigate to your Home page. Drop your <strong>Contact.txt</strong> file into the <em>Contact Data</em> box and your <strong>Transactions</strong> file into its box.</li>
+                <li><strong class="text-white">Upload to Dashboard:</strong> Navigate to your Home page. Drop your <strong>Contact Data</strong> file into the <em>Contact Data</em> box and your <strong>Transactions</strong> file into its box.</li>
                 <li><strong class="text-white">Initialization:</strong> Click <span class="text-blue-400 font-semibold">'Start Custom CSV Upload'</span>. The system will concurrently ingest rows in chunks into the Appwrite cloud database, including all contact fields and computed Loyalty Tier scores.</li>
                 <li><strong class="text-white">Customer Sync View:</strong> Once the algorithm finishes uploading and computing Tenure, Average Order Value, and Loyalty Tier scores, navigate to the <a routerLink="/customers" class="text-blue-500 hover:text-blue-400 font-mono text-sm px-1">/customers</a> portal to verify your computed variables before the Model Training step!</li>
             </ol>
@@ -24,7 +24,7 @@
         <div class="bg-slate-900/50 border border-emerald-500/20 rounded-2xl p-8 mb-8 hover:border-emerald-500/40 transition-colors shadow-lg">
             <h2 class="text-white text-2xl font-bold border-b border-emerald-500/20 pb-4 mb-6 flex items-center gap-3">
                 <span class="material-symbols-outlined text-emerald-400">contacts</span>
-                Contact.txt Structure
+                Contact Data Structure
             </h2>
             <p class="text-emerald-400/80 text-sm mb-6">Your contact spreadsheet must contain the following columns exactly as written. The file can be <code class="bg-white/5 px-1 rounded">.txt</code> or <code class="bg-white/5 px-1 rounded">.csv</code> with comma delimiters:</p>
             
@@ -117,7 +117,7 @@
         <div class="bg-slate-900/50 border border-blue-500/20 rounded-2xl p-8 mb-8 hover:border-blue-500/40 transition-colors shadow-lg">
             <h2 class="text-white text-2xl font-bold border-b border-blue-500/20 pb-4 mb-6 flex items-center gap-3">
                 <span class="material-symbols-outlined text-blue-400">receipt_long</span>
-                Transactions CSV Structure
+                Transactions Data Structure
             </h2>
             <p class="text-blue-400/80 text-sm mb-6">Each row represents a single purchase timeline element mapped to a customer:</p>
 
@@ -219,7 +219,7 @@
                     <div class="flex-none w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center text-yellow-400 font-bold border border-yellow-500/20">7</div>
                     <div>
                         <h3 class="text-white font-semibold text-lg mb-1">Loyalty Tier Score </h3>
-                        <p class="text-slate-400 text-sm">We map the customer's <code class="bg-white/5 px-1 rounded text-yellow-300">Loyalty Tier</code> column from Contact.txt into a numeric score for the ML model:
+                        <p class="text-slate-400 text-sm">We map the customer's <code class="bg-white/5 px-1 rounded text-yellow-300">Loyalty Tier</code> column from Contact data into a numeric score for the ML model:
                             <span class="text-yellow-300 font-mono"> high = 3</span>,
                             <span class="text-slate-300 font-mono"> medium = 2</span>,
                             <span class="text-amber-700 font-mono"> low = 1</span>,
