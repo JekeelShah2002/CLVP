@@ -15,11 +15,14 @@ export class AuthService {
 
   // Check if there is a valid session (cookie-based)
   async isLoggedIn(): Promise<boolean> {
+    console.log('[Auth] Checking session status...');
     try {
       const user = await this.appwrite.account.get(); // gets current user if session is valid
+      console.log(`[Auth] Session active. User: ${user.name || user.email || user.$id}`);
       this.currentUser.set(user);
       return true;
     } catch {
+      console.log('[Auth] No active session found.');
       this.currentUser.set(null);
       this.cachedJwt = null; // Clear token if invalid
       return false;
@@ -43,6 +46,7 @@ export class AuthService {
   }
 
   async signUp(email: string, password: string, name?: string) {
+    console.log(`[Auth] Signing up new user: ${email}...`);
     // Create user account
     await this.appwrite.account.create(ID.unique(), email, password, name);
     // Optional: auto-login after signup
@@ -50,8 +54,10 @@ export class AuthService {
   }
 
   async login(email: string, password: string) {
+    console.log(`[Auth] Attempting login for user: ${email}...`);
     // Creates a new session (cookie stored by Appwrite)
     await this.appwrite.account.createEmailPasswordSession(email, password);
+    console.log(`[Auth] Login successful for: ${email}`);
     // Populate the user signal so guards and interceptors work immediately
     await this.isLoggedIn();
     // Clear any stale cached JWT so the next request gets a fresh one
@@ -60,13 +66,16 @@ export class AuthService {
   }
 
   async logout() {
+    console.log('[Auth] Logging out current user...');
     // Delete "current session"
     try {
       await this.appwrite.account.deleteSession('current');
     } catch {
       // already logged out
+      console.log('[Auth] Already logged out on server-side.');
     }
     // Clear all state
+    console.log('[Auth] Session cleared locally.');
     this.currentUser.set(null);
     this.cachedJwt = null;
     this.jwtExpiresAt = 0;

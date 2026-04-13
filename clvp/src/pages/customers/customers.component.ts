@@ -14,10 +14,11 @@ import { LoaderService } from '../../app/core/loader.service';
 })
 export class CustomersComponent implements OnInit {
   private api = inject(ApiService);
-  private loader = inject(LoaderService);
+  public loader = inject(LoaderService);
   
   searchTerm = '';
   customers: any[] = [];
+  displayedCount = 50;
   error: string | null = null;
 
   ngOnInit() {
@@ -27,6 +28,7 @@ export class CustomersComponent implements OnInit {
   search() {
     this.loader.show();
     this.error = null;
+    this.displayedCount = 50;
     this.api.getCustomers(this.searchTerm).subscribe({
       next: (res: any) => {
         this.customers = res.customers;
@@ -38,5 +40,9 @@ export class CustomersComponent implements OnInit {
         console.error(err);
       }
     });
+  }
+
+  loadMore() {
+    this.displayedCount += 50;
   }
 }

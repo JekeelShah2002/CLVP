@@ -31,7 +31,7 @@
     <!-- Data Display -->
     <div *ngIf="!error && customers.length > 0" class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20">
         
-        <a *ngFor="let customer of customers" [routerLink]="['/customers', customer.customer_id]" class="bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-blue-500/50 transition-all shadow-xl hover:-translate-y-1 block group hover:bg-slate-800/80 cursor-pointer">
+        <a *ngFor="let customer of customers | slice:0:displayedCount" [routerLink]="['/customers', customer.customer_id]" class="bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-blue-500/50 transition-all shadow-xl hover:-translate-y-1 block group hover:bg-slate-800/80 cursor-pointer">
             <!-- Card Header -->
             <div class="flex items-start justify-between mb-4">
                 <div class="flex items-center gap-4">
@@ -93,8 +93,15 @@
 
     </div>
 
+    <!-- Load More Button -->
+    <div *ngIf="!error && customers.length > displayedCount" class="w-full max-w-6xl flex justify-center pb-20">
+        <button (click)="loadMore()" class="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-xl border border-white/10 text-sm font-semibold transition-all">
+            Load More Customers
+        </button>
+    </div>
+
     <!-- Empty State -->
-    <div *ngIf="!error && customers.length === 0" class="w-full max-w-3xl py-20 bg-slate-900/30 rounded-2xl border border-white/5 flex flex-col items-center text-center">
+    <div *ngIf="!error && customers.length === 0 && !loader.isLoading()" class="w-full max-w-3xl py-20 bg-slate-900/30 rounded-2xl border border-white/5 flex flex-col items-center text-center">
         <span class="material-symbols-outlined text-slate-600 text-5xl mb-4">search_off</span>
         <h3 class="text-white text-xl font-semibold mb-2">No Customers Found</h3>
         <p class="text-slate-400 text-sm">Try adjusting your search criteria or make sure data has been uploaded and processed.</p>

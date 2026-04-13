@@ -34,10 +34,12 @@ export class ApiService {
   }
 
   getCustomers(query: string = ''): Observable<any> {
+    console.log(`[API] Requesting all customers${query ? ` (Search term: "${query}")` : ''}...`);
     return this.http.get(`${this.baseUrl}/customers?q=${encodeURIComponent(query)}`);
   }
 
   getCustomerDetails(id: string): Observable<any> {
+    console.log(`[API] Requesting details for customer ID: ${id}...`);
     return this.http.get(`${this.baseUrl}/customers/${encodeURIComponent(id)}`);
   }
 }
