@@ -9,13 +9,14 @@ import { NotificationService } from '../../app/core/notification.service';
 import { ApiService } from '../../app/core/api.service';
 import { LoaderService } from '../../app/core/loader.service';
 import { firstValueFrom } from 'rxjs';
+import { AnimatedBgComponent } from '../../shared/animated-bg/animated-bg.component';
 
 type ValidationStatus = 'pending' | 'scanning' | 'valid' | 'invalid';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, NgClass, FormsModule],
+  imports: [CommonModule, NgClass, FormsModule, AnimatedBgComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })

@@ -2,11 +2,12 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../app/core/auth.service';
+import { AnimatedBgComponent } from '../../shared/animated-bg/animated-bg.component';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, AnimatedBgComponent],
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.css']
 })

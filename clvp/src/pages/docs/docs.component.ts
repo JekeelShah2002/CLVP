@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { AnimatedBgComponent } from '../../shared/animated-bg/animated-bg.component';
 
 @Component({
   selector: 'app-docs',
-  imports: [],
+  imports: [AnimatedBgComponent],
   templateUrl: './docs.component.html',
   styleUrl: './docs.component.css'
 })

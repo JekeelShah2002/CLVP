@@ -1,0 +1,74 @@
+/* ─────────────────────────────────────────────────────────────
+   AnimatedBgComponent — fixed full-screen animated background.
+   Place <app-animated-bg> as the first child of any page wrapper.
+   ───────────────────────────────────────────────────────────── */
+
+:host {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── Dark canvas ── */
+.animated-bg-root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.bg-base {
+  position: absolute;
+  inset: 0;
+  background: #0b0f1a;
+}
+
+/* ── Grid lines ── */
+.grid-overlay {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(124, 58, 237, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124, 58, 237, 0.06) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, black 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, black 40%, transparent 100%);
+}
+
+/* ── Particle container ── */
+.particles {
+  position: absolute;
+  inset: 0;
+}
+
+/* ── Individual particles ── */
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(139, 92, 246, 0.6);
+  animation: float-particle linear infinite;
+}
+
+/* Staggered positions & timings for 12 particles */
+.particle:nth-child(1)  { left: 5%;  animation-duration: 12s; animation-delay: 0s;    opacity: 0.8; }
+.particle:nth-child(2)  { left: 12%; animation-duration: 18s; animation-delay: 2s;    opacity: 0.5; }
+.particle:nth-child(3)  { left: 22%; animation-duration: 14s; animation-delay: 4s;    opacity: 0.7; }
+.particle:nth-child(4)  { left: 34%; animation-duration: 20s; animation-delay: 1s;    opacity: 0.4; }
+.particle:nth-child(5)  { left: 45%; animation-duration: 16s; animation-delay: 3s;    opacity: 0.6; }
+.particle:nth-child(6)  { left: 58%; animation-duration: 11s; animation-delay: 5s;    opacity: 0.5; }
+.particle:nth-child(7)  { left: 67%; animation-duration: 19s; animation-delay: 0.5s;  opacity: 0.7; }
+.particle:nth-child(8)  { left: 74%; animation-duration: 15s; animation-delay: 2.5s;  opacity: 0.4; }
+.particle:nth-child(9)  { left: 82%; animation-duration: 13s; animation-delay: 1.5s;  opacity: 0.8; }
+.particle:nth-child(10) { left: 89%; animation-duration: 17s; animation-delay: 3.5s;  opacity: 0.5; }
+.particle:nth-child(11) { left: 94%; animation-duration: 21s; animation-delay: 0.8s;  opacity: 0.6; }
+.particle:nth-child(12) { left: 30%; animation-duration: 14s; animation-delay: 4.2s;  opacity: 0.3; }
+
+@keyframes float-particle {
+  0%   { transform: translateY(110vh) scale(0.5); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+}

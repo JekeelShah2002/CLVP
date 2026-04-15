@@ -9,11 +9,12 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../app/core/auth.service';
 import { NotificationService } from '../../app/core/notification.service';
 import { LoaderService } from '../../app/core/loader.service';
+import { AnimatedBgComponent } from '../../shared/animated-bg/animated-bg.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, AnimatedBgComponent],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
 })

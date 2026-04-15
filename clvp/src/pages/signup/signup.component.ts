@@ -9,11 +9,12 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../app/core/auth.service';
 import { NotificationService } from '../../app/core/notification.service';
 import { LoaderService } from '../../app/core/loader.service';
+import { AnimatedBgComponent } from '../../shared/animated-bg/animated-bg.component';
 
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, AnimatedBgComponent],
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.css'],
 })

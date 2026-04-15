@@ -4,13 +4,14 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ApiService } from '../../app/core/api.service';
 import { LoaderService } from '../../app/core/loader.service';
 import { Chart, registerables } from 'chart.js';
+import { AnimatedBgComponent } from '../../shared/animated-bg/animated-bg.component';
 
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-customer-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, AnimatedBgComponent],
   templateUrl: './customer-detail.component.html',
   styleUrl: './customer-detail.component.css'
 })

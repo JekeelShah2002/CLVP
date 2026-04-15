@@ -6,7 +6,7 @@ import { authGuard } from './core/auth.guard';
 import { AboutComponent } from '../pages/about/about.component';
 import { CustomersComponent } from '../pages/customers/customers.component';
 import { DocsComponent } from '../pages/docs/docs.component';
-import { PageNotFoundComponent } from './pages/page-not-found/page-not-found.component';
+import { PageNotFoundComponent } from '../pages/page-not-found/page-not-found.component';
 import { LandingComponent } from '../pages/landing/landing.component';
 import { CustomerDetailComponent } from '../pages/customer-detail/customer-detail.component';
 

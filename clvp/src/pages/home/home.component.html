@@ -1,5 +1,6 @@
 <div [ngClass]="{'step-0-bg': currentStep === 0, 'step-1-bg': currentStep === 1, 'step-2-bg': currentStep === 2, 'step-3-bg': currentStep === 3}"
     class="min-h-screen flex items-center justify-center relative w-full flex-col">
+    <app-animated-bg></app-animated-bg>
 
     <!-- Dashboard / Welcome Back (Step 0) -->
     <div *ngIf="currentStep === 0" class="flex flex-1 justify-center py-16 px-6 relative w-full z-10 my-auto animate-fade-in">
