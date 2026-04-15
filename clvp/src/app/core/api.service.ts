@@ -33,9 +33,21 @@ export class ApiService {
     return this.http.post(`${this.baseUrl}/features/compute`, {});
   }
 
-  getCustomers(query: string = ''): Observable<any> {
-    console.log(`[API] Requesting all customers${query ? ` (Search term: "${query}")` : ''}...`);
+  /** Top 25 high-tier customers — used on /customers default load. ~26 Appwrite reads. */
+  getTopCustomers(): Observable<any> {
+    console.log('[API] Requesting top 25 customers...');
+    return this.http.get(`${this.baseUrl}/customers/top`);
+  }
+
+  /** Search customers by name or ID — only fires when user submits a query. */
+  searchCustomers(query: string): Observable<any> {
+    console.log(`[API] Searching customers for: "${query}"`);
     return this.http.get(`${this.baseUrl}/customers?q=${encodeURIComponent(query)}`);
+  }
+
+  /** @deprecated Use getTopCustomers() or searchCustomers() */
+  getCustomers(query: string = ''): Observable<any> {
+    return query ? this.searchCustomers(query) : this.getTopCustomers();
   }
 
   getCustomerDetails(id: string): Observable<any> {

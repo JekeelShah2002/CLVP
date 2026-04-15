@@ -1,17 +1,18 @@
 <div class="min-h-screen pt-24 px-6 md:px-12 bg-[#070b14] flex flex-col items-center">
     <!-- Header -->
-    <div class="w-full max-w-6xl flex flex-col md:flex-row md:justify-between items-start md:items-end gap-6 border-b border-white/5 pb-6 mb-8">
+    <div class="w-full max-w-6xl flex flex-col md:flex-row md:justify-between items-start md:items-end gap-6 border-b border-white/5 pb-6 mb-5">
         <div>
             <h1 class="text-white text-3xl font-extrabold tracking-tight">Customer Database</h1>
             <p class="text-slate-400 text-sm mt-1">View engineered features and demographics</p>
         </div>
-        
+
+        <!-- Search Bar -->
         <div class="flex items-center gap-3 w-full md:w-auto">
             <div class="relative w-full md:w-auto">
                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-lg">search</span>
-                <input 
-                    type="text" 
-                    [(ngModel)]="searchTerm" 
+                <input
+                    type="text"
+                    [(ngModel)]="searchTerm"
                     (keydown.enter)="search()"
                     placeholder="Search by name or ID..."
                     class="bg-slate-900 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all w-full md:w-64"
@@ -23,15 +24,49 @@
         </div>
     </div>
 
-    <!-- State Messages -->
+    <!-- Context Banner -->
+    <div class="w-full max-w-6xl mb-6">
+        <!-- Top 25 default view -->
+        <div *ngIf="viewMode === 'top' && !error && !loader.isLoading()"
+             class="flex items-start gap-3 bg-blue-500/10 border border-blue-500/20 rounded-xl px-4 py-3">
+            <span class="material-symbols-outlined text-blue-400 text-lg mt-0.5 shrink-0">military_tech</span>
+            <div>
+                <p class="text-blue-300 text-sm font-semibold">Showing Top 25 High-Value Customers</p>
+                <p class="text-slate-400 text-xs mt-0.5">Ranked by loyalty tier and total transaction value. Use the search bar above to look up any customer by name or ID.</p>
+            </div>
+        </div>
+
+        <!-- Active search results view -->
+        <div *ngIf="viewMode === 'search' && !error && !loader.isLoading()"
+             class="flex items-center justify-between gap-3 bg-slate-800/60 border border-white/10 rounded-xl px-4 py-3">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-slate-400 text-lg shrink-0">manage_search</span>
+                <div>
+                    <p class="text-slate-200 text-sm font-semibold">
+                        {{ customers.length }} result{{ customers.length !== 1 ? 's' : '' }} for
+                        <span class="text-blue-400">"{{ searchTerm }}"</span>
+                    </p>
+                    <p class="text-slate-500 text-xs mt-0.5">Showing up to 50 matches.</p>
+                </div>
+            </div>
+            <button (click)="clearSearch()"
+                    class="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white border border-white/10 hover:border-white/30 rounded-lg px-3 py-1.5 transition-all shrink-0">
+                <span class="material-symbols-outlined text-sm">close</span>
+                Clear
+            </button>
+        </div>
+    </div>
+
+    <!-- Error -->
     <div *ngIf="error" class="w-full max-w-6xl bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg mb-8">
         {{ error }}
     </div>
 
-    <!-- Data Display -->
+    <!-- Customer Cards Grid -->
     <div *ngIf="!error && customers.length > 0" class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20">
-        
-        <a *ngFor="let customer of customers | slice:0:displayedCount" [routerLink]="['/customers', customer.customer_id]" class="bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-blue-500/50 transition-all shadow-xl hover:-translate-y-1 block group hover:bg-slate-800/80 cursor-pointer">
+
+        <a *ngFor="let customer of customers" [routerLink]="['/customers', customer.customer_id]"
+           class="bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-blue-500/50 transition-all shadow-xl hover:-translate-y-1 block group hover:bg-slate-800/80 cursor-pointer">
             <!-- Card Header -->
             <div class="flex items-start justify-between mb-4">
                 <div class="flex items-center gap-4">
@@ -43,8 +78,21 @@
                         <p class="text-slate-500 text-xs font-mono">ID: {{ customer.customer_id }}</p>
                     </div>
                 </div>
-                <div class="opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span class="material-symbols-outlined text-blue-400 text-xl">arrow_forward</span>
+                <!-- Loyalty tier badge -->
+                <div class="flex flex-col items-end gap-1">
+                    <span *ngIf="customer.features?.loyalty_tier_score === 3"
+                          class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
+                        High
+                    </span>
+                    <span *ngIf="customer.features?.loyalty_tier_score === 2"
+                          class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                        Medium
+                    </span>
+                    <span *ngIf="customer.features?.loyalty_tier_score === 1"
+                          class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-500/20 text-slate-400 border border-slate-500/30">
+                        Low
+                    </span>
+                    <span class="material-symbols-outlined text-blue-400 text-xl opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
                 </div>
             </div>
 
@@ -93,17 +141,22 @@
 
     </div>
 
-    <!-- Load More Button -->
-    <div *ngIf="!error && customers.length > displayedCount" class="w-full max-w-6xl flex justify-center pb-20">
-        <button (click)="loadMore()" class="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-xl border border-white/10 text-sm font-semibold transition-all">
-            Load More Customers
+    <!-- Empty State: Search -->
+    <div *ngIf="!error && customers.length === 0 && viewMode === 'search' && !loader.isLoading()"
+         class="w-full max-w-3xl py-20 bg-slate-900/30 rounded-2xl border border-white/5 flex flex-col items-center text-center">
+        <span class="material-symbols-outlined text-slate-600 text-5xl mb-4">search_off</span>
+        <h3 class="text-white text-xl font-semibold mb-2">No Customers Found</h3>
+        <p class="text-slate-400 text-sm mb-6">No results for <span class="text-blue-400">"{{ searchTerm }}"</span>. Try a different name or customer ID.</p>
+        <button (click)="clearSearch()" class="text-sm text-slate-300 hover:text-white border border-white/10 hover:border-white/30 px-4 py-2 rounded-lg transition-all">
+            ← Back to Top Customers
         </button>
     </div>
 
-    <!-- Empty State -->
-    <div *ngIf="!error && customers.length === 0 && !loader.isLoading()" class="w-full max-w-3xl py-20 bg-slate-900/30 rounded-2xl border border-white/5 flex flex-col items-center text-center">
-        <span class="material-symbols-outlined text-slate-600 text-5xl mb-4">search_off</span>
-        <h3 class="text-white text-xl font-semibold mb-2">No Customers Found</h3>
-        <p class="text-slate-400 text-sm">Try adjusting your search criteria or make sure data has been uploaded and processed.</p>
+    <!-- Empty State: No data at all -->
+    <div *ngIf="!error && customers.length === 0 && viewMode === 'top' && !loader.isLoading()"
+         class="w-full max-w-3xl py-20 bg-slate-900/30 rounded-2xl border border-white/5 flex flex-col items-center text-center">
+        <span class="material-symbols-outlined text-slate-600 text-5xl mb-4">database_off</span>
+        <h3 class="text-white text-xl font-semibold mb-2">No Customer Data</h3>
+        <p class="text-slate-400 text-sm">Make sure your data has been uploaded and features have been computed on the home page.</p>
     </div>
 </div>

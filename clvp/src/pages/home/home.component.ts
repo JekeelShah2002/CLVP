@@ -67,7 +67,8 @@ export class HomeComponent implements OnInit {
 
     this.loader.show();
     try {
-      const res = await firstValueFrom(this.api.getCustomers());
+      // Cheap check (~26 DB reads): if top customers exist, user has data
+      const res = await firstValueFrom(this.api.getTopCustomers());
       if (res && res.customers && res.customers.length > 0) {
         this.hasExistingData = true;
         this.currentStep = 0; // Dashboard Welcome Back
