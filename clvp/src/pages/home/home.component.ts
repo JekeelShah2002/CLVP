@@ -59,7 +59,7 @@ export class HomeComponent implements OnInit {
   private readonly DATA_FLAG_KEY = 'clvp_has_data';
 
   async ngOnInit() {
-    // Fast-path: if we've previously confirmed data exists, show welcome screen immediately
+    // If we've previously confirmed data exists, show welcome screen immediately
     const hasFlag = localStorage.getItem(this.DATA_FLAG_KEY) === 'true';
     if (hasFlag) {
       this.hasExistingData = true;
@@ -68,9 +68,9 @@ export class HomeComponent implements OnInit {
 
     this.loader.show();
     try {
-      // Cheap check (~26 DB reads): if top customers exist, user has data
-      const res = await firstValueFrom(this.api.getTopCustomers());
-      if (res && res.customers && res.customers.length > 0) {
+      // Check if dashboard JSON in Appwrite Storage
+      const res = await firstValueFrom(this.api.checkDashboardStatus());
+      if (res && res.exists) {
         this.hasExistingData = true;
         this.currentStep = 0; // Dashboard Welcome Back
         localStorage.setItem(this.DATA_FLAG_KEY, 'true');
@@ -152,22 +152,30 @@ export class HomeComponent implements OnInit {
     if (!this.contactsFile || !this.transactionsFile) return;
 
     try {
-      // Step 1: Upload Contacts
-      this.analysisProgress = 10;
-      await firstValueFrom(this.api.uploadContacts(this.contactsFile));
-
-      // Step 2: Upload Transactions
-      this.analysisProgress = 40;
-      await firstValueFrom(this.api.uploadTransactions(this.transactionsFile));
-
-      // Step 3: Compute Features (including loyalty_tier_score)
+      this.analysisProgress = 15;
+      
+      // Zero-Cost Architecture: We send files once to Prediction Engine, 
+      // which does 100% of the Heavy Lifting and compiles the JSON native database.
+      const mlRes = await firstValueFrom(this.api.getPredictions(this.contactsFile, this.transactionsFile));
+      
       this.analysisProgress = 70;
-      const res = await firstValueFrom(this.api.computeFeatures());
+      console.log('ML Target Engine returned:', mlRes.processed, 'profiles compiled.');
+
+      // Wait a moment for file write flush on Node
+      await new Promise(r => setTimeout(r, 1000));
+      this.analysisProgress = 85;
+
+      // Cloud Sync: Push the compiled JSON to Appwrite Storage for persistence
+      try {
+        await firstValueFrom(this.api.syncDashboard());
+        console.log('[Home] Cloud sync successful.');
+      } catch (syncErr) {
+        console.warn('[Home] Cloud backup failed (non-critical):', syncErr);
+      }
 
       this.analysisProgress = 100;
       this.analysisStatus = 'complete';
       localStorage.setItem(this.DATA_FLAG_KEY, 'true'); // Mark as returning user
-      console.log('Features computed:', res);
     } catch (err) {
       console.error(err);
       this.ns.error('Server error during analysis computation.');

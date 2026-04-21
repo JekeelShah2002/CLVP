@@ -27,25 +27,49 @@
             <div class="bg-slate-900/60 border border-white/5 shadow-2xl rounded-2xl p-8 relative overflow-hidden backdrop-blur-xl">
                 <div class="absolute -top-16 -right-16 w-32 h-32 bg-blue-500/20 rounded-full blur-[50px]"></div>
                 
-                <div class="flex items-center gap-5 mb-6 relative z-10">
-                    <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold text-2xl shadow-lg ring-4 ring-slate-900">
+                <div class="flex flex-col items-center text-center mb-8 relative z-10">
+                    <!-- Premium Avatar -->
+                    <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center text-white font-black text-3xl shadow-[0_0_30px_rgba(79,70,229,0.3)] ring-4 ring-slate-900 mb-6 transition-transform hover:scale-105 duration-300">
                         {{ customerData.demographics?.FullName ? customerData.demographics.FullName.charAt(0).toUpperCase() : (customerData.demographics?.FirstName ? customerData.demographics.FirstName.charAt(0).toUpperCase() : '?') }}
                     </div>
-                    <div>
-                        <h2 class="text-white font-bold text-xl">{{ customerData.demographics?.FullName || customerData.demographics?.FirstName || 'Unknown User' }}</h2>
-                        <p class="text-slate-400 text-xs mt-0.5">{{ customerData.demographics?.Occupation || 'Occupation N/A' }}</p>
+                    
+                    <h2 class="text-white font-black text-2xl tracking-tight mb-1">{{ customerData.demographics?.FullName || customerData.demographics?.FirstName || 'Unknown User' }}</h2>
+                    <p class="text-slate-400 text-sm font-medium mb-4">{{ customerData.demographics?.Occupation || 'Occupation N/A' }}</p>
+                    
+                    <!-- Segment & Tier Row -->
+                    <div class="flex flex-wrap justify-center gap-2 mt-2">
+                        <!-- Smart Segment Badge (Pre-computed) -->
+                        <div *ngIf="customerData.features?.segment as seg" 
+                             [class]="'flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ' + getSegmentClass(seg)">
+                            <span class="material-symbols-outlined text-sm">psychology</span>
+                            {{ seg }}
+                        </div>
+
                         <!-- Loyalty Tier Badge -->
                         <span *ngIf="customerData.demographics?.LoyaltyTier"
-                            class="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-md uppercase tracking-wider mt-2"
+                            class="inline-flex items-center gap-1 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border"
                             [ngClass]="{
-                                'bg-yellow-400/15 text-yellow-300 border border-yellow-400/30': customerData.demographics.LoyaltyTier.toLowerCase() === 'high',
-                                'bg-slate-400/15 text-slate-300 border border-slate-400/30': customerData.demographics.LoyaltyTier.toLowerCase() === 'medium',
-                                'bg-amber-700/20 text-amber-600 border border-amber-700/30': customerData.demographics.LoyaltyTier.toLowerCase() === 'low'
+                                'bg-yellow-400/10 text-yellow-300 border-yellow-400/30' : customerData.demographics.LoyaltyTier.toLowerCase() === 'high',
+                                'bg-slate-400/10 text-slate-300 border-slate-400/30'   : customerData.demographics.LoyaltyTier.toLowerCase() === 'medium',
+                                'bg-amber-700/10 text-amber-600 border-amber-700/30'   : customerData.demographics.LoyaltyTier.toLowerCase() === 'low'
                             }">
-                            <span class="material-symbols-outlined text-sm">star</span>
-                            {{ customerData.demographics.LoyaltyTier | titlecase }} Tier
+                            <span class="material-symbols-outlined text-sm">workspace_premium</span>
+                            {{ customerData.demographics.LoyaltyTier | titlecase }}
                         </span>
                     </div>
+                </div>
+
+                <!-- AI Recommended Action Callout -->
+                <div *ngIf="customerData.features?.suggested_action" 
+                     class="bg-blue-600/10 border border-blue-500/20 rounded-xl p-4 relative z-10 overflow-hidden group hover:bg-blue-600/15 transition-all duration-300">
+                    <div class="absolute top-0 right-0 p-2 opacity-5 group-hover:opacity-10 transition-opacity">
+                         <span class="material-symbols-outlined text-4xl">lightbulb</span>
+                    </div>
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                        <p class="text-blue-300 text-[9px] font-bold uppercase tracking-[0.2em]">Recommended Strategy</p>
+                    </div>
+                    <p class="text-white text-sm font-bold tracking-tight">{{ customerData.features.suggested_action }}</p>
                 </div>
 
                 <div class="flex flex-col gap-3 relative z-10 text-sm">
@@ -92,6 +116,26 @@
                     <div class="flex justify-between">
                         <span class="text-slate-500">Member Since</span>
                         <span class="text-slate-200">{{ customerData.demographics?.CreatedOn || '-' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Prediction Card (Premium Display) -->
+            <div *ngIf="customerData.features" class="bg-gradient-to-br from-blue-600/20 to-indigo-600/20 border border-blue-500/30 shadow-[0_0_30px_rgba(59,130,246,0.15)] rounded-2xl p-6 relative overflow-hidden backdrop-blur-md">
+                <div class="absolute top-0 right-0 p-3 opacity-10">
+                    <span class="material-symbols-outlined text-6xl">auto_graph</span>
+                </div>
+                <div class="relative z-10">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="material-symbols-outlined text-blue-400 text-sm">psychology</span>
+                        <p class="text-blue-300 text-[10px] font-bold uppercase tracking-widest">XGB V1.0 Prediction</p>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <h3 class="text-white text-4xl font-black tracking-tight">{{ customerData.features.clv_score | currency }}</h3>
+                        <p class="text-blue-400/60 text-[10px] font-medium">Predicted Revenue (Next 180 Days)</p>
+                    </div>
+                    <div class="mt-4 h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                        <div class="h-full bg-blue-500 shadow-[0_0_10px_#3b82f6]" [style.width.%]="clamp(customerData.features.clv_score / 10, 0, 100)"></div>
                     </div>
                 </div>
             </div>
@@ -197,7 +241,7 @@
                             <tbody>
                                 <tr *ngFor="let tx of customerData.transactions" class="border-b border-white/5 hover:bg-white/5 transition-colors">
                                     <td class="py-3 px-4 text-slate-300 text-sm">{{ tx.PurchasedOn | date:'mediumDate' }}</td>
-                                    <td class="py-3 px-4 text-slate-500 text-xs font-mono">{{ tx.transaction_id.substring(0, 12) }}...</td>
+                                    <td class="py-3 px-4 text-slate-500 text-xs font-mono">{{ tx.PurchaseId?.substring(0, 12) }}...</td>
                                     <td class="py-3 px-4 text-slate-400 text-xs">{{ tx.ActivityTypeDisplay || 'Order' }}</td>
                                     <td class="py-3 px-4 text-emerald-400 font-semibold text-right text-sm">{{ tx.TotalPrice | currency }}</td>
                                 </tr>

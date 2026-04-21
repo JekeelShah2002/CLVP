@@ -74,4 +74,13 @@ export class CustomersComponent implements OnInit {
     this.searchTerm = '';
     this.loadTopCustomers();
   }
+
+  getSegmentClass(segment: string): string {
+    const s = (segment || '').toLowerCase();
+    if (s.includes('champion')) return 'bg-yellow-400/10 text-yellow-500 border-yellow-500/30 shadow-[0_0_15px_rgba(250,204,21,0.1)]';
+    if (s.includes('at-risk'))  return 'bg-rose-400/10 text-rose-500 border-rose-500/30 shadow-[0_0_15px_rgba(244,63,94,0.1)]';
+    if (s.includes('loyal'))    return 'bg-emerald-400/10 text-emerald-500 border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.1)]';
+    if (s.includes('growth'))   return 'bg-indigo-400/10 text-indigo-400 border-indigo-500/30 shadow-[0_0_15px_rgba(99,102,241,0.1)]';
+    return 'bg-slate-400/10 text-slate-400 border-white/5';
+  }
 }

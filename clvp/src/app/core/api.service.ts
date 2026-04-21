@@ -54,4 +54,26 @@ export class ApiService {
     console.log(`[API] Requesting details for customer ID: ${id}...`);
     return this.http.get(`${this.baseUrl}/customers/${encodeURIComponent(id)}`);
   }
+
+  // --- NEW AI PREDICTION ENDPOINTS ---
+  getPredictions(contacts: File, transactions: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('contacts', contacts);
+    formData.append('purchases', transactions);
+    // Hardcoded to the engine port. In prod, use environment variable.
+    return this.http.post(`http://localhost:5000/predict`, formData);
+  }
+
+  savePredictions(predictions: any[]): Observable<any> {
+    return this.http.post(`${this.baseUrl}/features/scores`, { predictions });
+  }
+
+  // --- CLOUD DASHBOARD SYNC (Zero-Cost Arch) ---
+  checkDashboardStatus(): Observable<{ exists: boolean; source?: string }> {
+    return this.http.get<{ exists: boolean; source?: string }>(`${this.baseUrl}/dashboard/status`);
+  }
+
+  syncDashboard(): Observable<any> {
+    return this.http.post(`${this.baseUrl}/dashboard/sync`, {});
+  }
 }

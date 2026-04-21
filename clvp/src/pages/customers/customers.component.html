@@ -76,24 +76,32 @@
                     </div>
                     <div>
                         <h3 class="text-white font-semibold text-lg">{{ customer.FullName || customer.FirstName || 'Unknown' }}</h3>
-                        <p class="text-slate-500 text-xs font-mono">ID: {{ customer.customer_id }}</p>
+                        <div class="flex items-center gap-2">
+                            <p class="text-slate-500 text-[10px] font-mono tracking-tight">ID: {{ customer.customer_id }}</p>
+                            <span *ngIf="customer.features?.suggested_action" class="text-blue-500/80 text-[9px] font-bold uppercase tracking-tight">• {{ customer.features.suggested_action }}</span>
+                        </div>
                     </div>
                 </div>
-                <!-- Loyalty tier badge -->
-                <div class="flex flex-col items-end gap-1">
-                    <span *ngIf="customer.features?.loyalty_tier_score === 3"
-                          class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
-                        High
-                    </span>
-                    <span *ngIf="customer.features?.loyalty_tier_score === 2"
-                          class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
-                        Medium
-                    </span>
-                    <span *ngIf="customer.features?.loyalty_tier_score === 1"
-                          class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-500/20 text-slate-400 border border-slate-500/30">
-                        Low
-                    </span>
-                    <span class="material-symbols-outlined text-blue-400 text-xl opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+                <!-- Loyalty & Segment badges -->
+                <div class="flex flex-col items-end gap-1.5 shrink-0">
+                    <div *ngIf="customer.features?.segment as seg" 
+                         [class]="'text-[9px] font-black uppercase tracking-[0.1em] px-2 py-0.5 rounded-md border ' + getSegmentClass(seg)">
+                        {{ seg }}
+                    </div>
+                    <div class="flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
+                        <span *ngIf="customer.features?.loyalty_tier_score === 3"
+                              class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-yellow-400/10 text-yellow-400 border border-yellow-400/20">
+                            High
+                        </span>
+                        <span *ngIf="customer.features?.loyalty_tier_score === 2"
+                              class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-400/10 text-blue-400 border border-blue-400/20">
+                            Med
+                        </span>
+                        <span *ngIf="customer.features?.loyalty_tier_score === 1"
+                              class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-400/10 text-slate-400 border border-slate-400/20">
+                            Low
+                        </span>
+                    </div>
                 </div>
             </div>
 
@@ -117,18 +125,14 @@
                     <span class="text-slate-500 text-[10px] uppercase font-bold tracking-wider mb-1">Transactions</span>
                     <span class="text-white font-semibold">{{ customer.features.num_transactions }}</span>
                 </div>
-                <div class="flex flex-col">
-                    <span class="text-slate-500 text-[10px] uppercase font-bold tracking-wider mb-1">Frequency</span>
-                    <span class="text-blue-400 font-semibold">{{ customer.features.frequency | number:'1.1-2' }}/mo</span>
-                </div>
-                <div class="col-span-2 pt-2 border-t border-white/5 mt-1 flex justify-between items-center">
-                    <div class="flex flex-col">
-                        <span class="text-slate-500 text-[10px] uppercase font-bold tracking-wider mb-0.5">Last Purchase</span>
-                        <span class="text-slate-300 text-xs">{{ customer.features.last_purchase_date | date:'mediumDate' }}</span>
+                <div class="col-span-2 pt-2 border-t border-white/5 mt-1 grid grid-cols-2 gap-2">
+                    <div class="flex flex-col bg-blue-600/5 p-2 rounded-lg border border-blue-500/10">
+                        <span class="text-blue-300 text-[10px] uppercase font-bold tracking-wider mb-0.5">Predicted Revenue</span>
+                        <span class="text-white font-bold text-sm leading-tight">{{ customer.features.clv_score | currency }}</span>
                     </div>
-                    <div class="flex flex-col text-right">
-                        <span class="text-slate-500 text-[10px] uppercase font-bold tracking-wider mb-0.5">Tenure</span>
-                        <span class="text-slate-300 text-xs">{{ customer.features.customer_tenure_days }} days</span>
+                    <div class="flex flex-col text-right p-2">
+                        <span class="text-slate-500 text-[10px] uppercase font-bold tracking-wider mb-0.5">Frequency</span>
+                        <span class="text-blue-400 font-bold ml-auto">{{ customer.features.frequency | number:'1.1-2' }}/mo</span>
                     </div>
                 </div>
             </div>
