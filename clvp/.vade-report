@@ -1,0 +1,46 @@
+Implemented Vercel Web Analytics for Angular project
+
+## Changes Made
+
+### 1. Installed @vercel/analytics package
+- Added @vercel/analytics@^2.0.1 to project dependencies
+- Used `--legacy-peer-deps` flag to resolve peer dependency conflicts with existing Angular/Vite setup
+
+### 2. Modified Files
+
+**src/main.ts**
+- Added import for `inject` function from '@vercel/analytics'
+- Added `inject()` call to initialize Vercel Web Analytics
+- Follows the same pattern as the existing Vercel Speed Insights integration
+
+### 3. Implementation Details
+
+Following the official Vercel documentation, I integrated Web Analytics using the generic `inject()` function approach, which is the recommended method for Angular applications. The implementation mirrors the existing Speed Insights setup already present in the project.
+
+The `inject()` function is called early in the application bootstrap process (in main.ts), ensuring that Web Analytics tracking is initialized before the Angular application starts, allowing it to automatically track all page views and user interactions.
+
+### 4. Verification
+
+- ✅ Build completed successfully (`npm run build`)
+- ✅ No new errors or warnings introduced
+- ✅ Code follows existing project patterns and conventions
+- ✅ Lock files updated (package-lock.json)
+
+### 5. Next Steps
+
+To complete the setup:
+1. Enable Web Analytics in the Vercel Dashboard for this project
+2. Deploy the application to Vercel
+3. Verify tracking is working by checking the Analytics dashboard after deployment
+
+## Files Modified
+- `package.json` - Added @vercel/analytics dependency
+- `package-lock.json` - Updated with new dependency tree
+- `src/main.ts` - Added Analytics injection call
+
+## Notes
+
+- The integration uses the same pattern as the existing @vercel/speed-insights integration
+- Analytics tracking automatically captures page views without additional configuration
+- Data collection only occurs in production mode (development mode is excluded by default)
+- No breaking changes to existing functionality
