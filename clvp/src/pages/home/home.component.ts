@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule, TitleCasePipe, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 import { AuthService } from '../../app/core/auth.service';
 import { FileService, Delimiter } from '../../app/core/file.service';
@@ -16,7 +16,7 @@ type ValidationStatus = 'pending' | 'scanning' | 'valid' | 'invalid';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, NgClass, FormsModule, AnimatedBgComponent],
+  imports: [CommonModule, NgClass, FormsModule, AnimatedBgComponent, RouterModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })

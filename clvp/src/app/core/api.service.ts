@@ -55,6 +55,11 @@ export class ApiService {
     return this.http.get(`${this.baseUrl}/customers/${encodeURIComponent(id)}`);
   }
 
+  // --- DASHBOARD ANALYTICS ---
+  getDashboardAnalytics(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/dashboard/analytics`);
+  }
+
   // --- NEW AI PREDICTION ENDPOINTS ---
   getPredictions(contacts: File, transactions: File): Observable<any> {
     const formData = new FormData();

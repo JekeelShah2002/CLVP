@@ -1,0 +1,386 @@
+<app-animated-bg></app-animated-bg>
+
+<div class="relative z-10 px-4 sm:px-6 lg:px-10 xl:px-16 py-8 max-w-[1600px] mx-auto">
+
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!-- HEADER                                                               -->
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10 animate-in">
+    <div>
+      <div class="flex items-center gap-3 mb-2">
+        <div class="h-10 w-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center border border-indigo-500/20">
+          <span class="material-symbols-outlined text-xl">analytics</span>
+        </div>
+        <h1 class="text-white text-2xl md:text-3xl font-extrabold tracking-tight">Analytics Dashboard</h1>
+      </div>
+      <p class="text-slate-400 text-sm font-light ml-[52px]">Real-time business intelligence from your CLV prediction engine.</p>
+    </div>
+    <div class="flex items-center gap-3 ml-auto">
+      <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+        <span class="pulse-dot green"></span>
+        <span class="text-emerald-400 text-xs font-bold uppercase tracking-wider">Live</span>
+      </div>
+      <button routerLink="/home" class="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-sm font-medium transition-all flex items-center gap-2">
+        <span class="material-symbols-outlined text-base">home</span>
+        Home
+      </button>
+    </div>
+  </header>
+
+  <!-- ERROR STATE -->
+  <div *ngIf="error" class="text-center py-20">
+    <span class="material-symbols-outlined text-5xl text-rose-500 mb-4 block">error</span>
+    <p class="text-rose-400 text-lg font-semibold">{{ error }}</p>
+    <button (click)="fetchAnalytics()" class="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-bold transition-all">Retry</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!-- KPI CARDS ROW                                                        -->
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <div *ngIf="data" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+
+    <div class="glass-card kpi-card blue p-5 animate-in animate-in-delay-1">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="material-symbols-outlined text-blue-400 text-lg">groups</span>
+        <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Total Customers</span>
+      </div>
+      <p class="text-white text-3xl font-black tracking-tight">{{ data.kpis.totalCustomers | number }}</p>
+    </div>
+
+    <div class="glass-card kpi-card emerald p-5 animate-in animate-in-delay-2">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="material-symbols-outlined text-emerald-400 text-lg">payments</span>
+        <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Total Revenue</span>
+      </div>
+      <p class="text-white text-3xl font-black tracking-tight">${{ data.kpis.totalRevenue | number }}</p>
+    </div>
+
+    <div class="glass-card kpi-card violet p-5 animate-in animate-in-delay-3">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="material-symbols-outlined text-violet-400 text-lg">trending_up</span>
+        <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Forecasted CLV</span>
+      </div>
+      <p class="text-white text-3xl font-black tracking-tight">${{ data.kpis.totalForecastedCLV | number }}</p>
+      <p class="text-slate-500 text-[10px] font-medium mt-1">Avg ${{ data.kpis.avgClvPerCustomer | number }} / customer</p>
+    </div>
+
+    <div class="glass-card kpi-card amber p-5 animate-in animate-in-delay-4">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="material-symbols-outlined text-amber-400 text-lg">receipt_long</span>
+        <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Total Orders</span>
+      </div>
+      <p class="text-white text-3xl font-black tracking-tight">{{ data.kpis.totalTransactions | number }}</p>
+      <p class="text-slate-500 text-[10px] font-medium mt-1">Avg ${{ data.kpis.avgOrderValue | number }} / order</p>
+    </div>
+
+    <div class="glass-card kpi-card cyan p-5 animate-in animate-in-delay-5">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="material-symbols-outlined text-cyan-400 text-lg">diamond</span>
+        <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider">High Tier</span>
+      </div>
+      <p class="text-white text-3xl font-black tracking-tight">{{ data.kpis.highTierCustomers | number }}</p>
+      <p class="text-slate-500 text-[10px] font-medium mt-1">{{ (data.kpis.highTierCustomers / data.kpis.totalCustomers * 100) | number:'1.1-1' }}% of base</p>
+    </div>
+
+    <div class="glass-card kpi-card rose p-5 animate-in animate-in-delay-6">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="material-symbols-outlined text-rose-400 text-lg">warning</span>
+        <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider">At-Risk</span>
+      </div>
+      <p class="text-white text-3xl font-black tracking-tight">{{ data.kpis.atRiskCustomers | number }}</p>
+      <p class="text-slate-500 text-[10px] font-medium mt-1">{{ (data.kpis.atRiskCustomers / data.kpis.totalCustomers * 100) | number:'1.1-1' }}% of base</p>
+    </div>
+
+    <div class="glass-card kpi-card indigo p-5 animate-in animate-in-delay-7">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="material-symbols-outlined text-indigo-400 text-lg">avg_pace</span>
+        <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Avg CLV</span>
+      </div>
+      <p class="text-white text-3xl font-black tracking-tight">${{ data.kpis.avgClvPerCustomer | number }}</p>
+    </div>
+
+    <div class="glass-card kpi-card teal p-5 animate-in animate-in-delay-8">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="material-symbols-outlined text-teal-400 text-lg">shopping_cart</span>
+        <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Avg Order</span>
+      </div>
+      <p class="text-white text-3xl font-black tracking-tight">${{ data.kpis.avgOrderValue | number }}</p>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!-- ROW 1: Revenue Trend (Full Width)                                    -->
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <div *ngIf="data" class="glass-card p-6 mb-6 animate-in animate-in-delay-2">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h2 class="section-title">Monthly Revenue Trend</h2>
+        <p class="section-subtitle">Aggregated transaction revenue over time</p>
+      </div>
+      <span class="material-symbols-outlined text-blue-400/60 text-2xl">show_chart</span>
+    </div>
+    <div class="chart-container" style="height: 320px;">
+      <canvas #revenueChart></canvas>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!-- ROW 2: Segments + Loyalty Tiers + Gender                             -->
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <div *ngIf="data" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+
+    <!-- Segments -->
+    <div class="glass-card p-6 animate-in animate-in-delay-3">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="section-title">Customer Segments</h2>
+          <p class="section-subtitle">AI-predicted behavioral segments</p>
+        </div>
+        <span class="material-symbols-outlined text-yellow-400/60 text-xl">pie_chart</span>
+      </div>
+      <div class="chart-container" style="height: 260px;">
+        <canvas #segmentChart></canvas>
+      </div>
+    </div>
+
+    <!-- Loyalty Tiers -->
+    <div class="glass-card p-6 animate-in animate-in-delay-4">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="section-title">Loyalty Tiers</h2>
+          <p class="section-subtitle">Customer distribution by loyalty</p>
+        </div>
+        <span class="material-symbols-outlined text-amber-400/60 text-xl">loyalty</span>
+      </div>
+      <div class="chart-container" style="height: 260px;">
+        <canvas #tierChart></canvas>
+      </div>
+    </div>
+
+    <!-- Gender -->
+    <div class="glass-card p-6 animate-in animate-in-delay-5">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="section-title">Gender Distribution</h2>
+          <p class="section-subtitle">Customer base by gender</p>
+        </div>
+        <span class="material-symbols-outlined text-violet-400/60 text-xl">wc</span>
+      </div>
+      <div class="chart-container" style="height: 260px;">
+        <canvas #genderChart></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!-- ROW 3: CLV Distribution + Satisfaction + Email Subscribers           -->
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <div *ngIf="data" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+
+    <!-- CLV Distribution -->
+    <div class="glass-card p-6 animate-in animate-in-delay-3">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="section-title">CLV Score Distribution</h2>
+          <p class="section-subtitle">Predicted lifetime value buckets</p>
+        </div>
+        <span class="material-symbols-outlined text-indigo-400/60 text-xl">bar_chart</span>
+      </div>
+      <div class="chart-container" style="height: 260px;">
+        <canvas #clvDistChart></canvas>
+      </div>
+    </div>
+
+    <!-- Satisfaction -->
+    <div class="glass-card p-6 animate-in animate-in-delay-4">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="section-title">Customer Satisfaction</h2>
+          <p class="section-subtitle">Self-reported satisfaction levels</p>
+        </div>
+        <span class="material-symbols-outlined text-emerald-400/60 text-xl">sentiment_satisfied</span>
+      </div>
+      <div class="chart-container" style="height: 260px;">
+        <canvas #satisfactionChart></canvas>
+      </div>
+    </div>
+
+    <!-- Email Subscribers -->
+    <div class="glass-card p-6 animate-in animate-in-delay-5">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="section-title">Email Subscribers</h2>
+          <p class="section-subtitle">Opt-in vs opt-out ratio</p>
+        </div>
+        <span class="material-symbols-outlined text-teal-400/60 text-xl">mail</span>
+      </div>
+      <div class="chart-container" style="height: 260px;">
+        <canvas #emailSubChart></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!-- ROW 4: Occupations + Income + Top States                             -->
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <div *ngIf="data" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+
+    <!-- Occupations -->
+    <div class="glass-card p-6 animate-in animate-in-delay-3">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="section-title">Customers by Occupation</h2>
+          <p class="section-subtitle">Professional distribution</p>
+        </div>
+        <span class="material-symbols-outlined text-pink-400/60 text-xl">work</span>
+      </div>
+      <div class="chart-container" style="height: 260px;">
+        <canvas #occupationChart></canvas>
+      </div>
+    </div>
+
+    <!-- Income Brackets -->
+    <div class="glass-card p-6 animate-in animate-in-delay-4">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="section-title">Income Brackets</h2>
+          <p class="section-subtitle">Customer income distribution</p>
+        </div>
+        <span class="material-symbols-outlined text-orange-400/60 text-xl">account_balance</span>
+      </div>
+      <div class="chart-container" style="height: 260px;">
+        <canvas #incomeChart></canvas>
+      </div>
+    </div>
+
+    <!-- Top States -->
+    <div class="glass-card p-6 animate-in animate-in-delay-5">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="section-title">Top States</h2>
+          <p class="section-subtitle">Geographic customer concentration</p>
+        </div>
+        <span class="material-symbols-outlined text-teal-400/60 text-xl">location_on</span>
+      </div>
+      <div class="chart-container" style="height: 260px;">
+        <canvas #stateChart></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!-- ROW 5: Top CLV Customers + At-Risk High-Value Customers              -->
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <div *ngIf="data" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
+
+    <!-- Top 10 CLV Customers -->
+    <div class="glass-card p-6 animate-in animate-in-delay-6">
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <h2 class="section-title flex items-center gap-2">
+            <span class="material-symbols-outlined text-yellow-400 text-lg">emoji_events</span>
+            Top 10 Highest CLV Customers
+          </h2>
+          <p class="section-subtitle">Your most valuable predicted customers</p>
+        </div>
+        <a routerLink="/customers" class="action-link flex items-center gap-1">
+          View All <span class="material-symbols-outlined text-sm">arrow_forward</span>
+        </a>
+      </div>
+      <div class="scroll-container">
+        <table class="dash-table">
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Predicted CLV (Next 180 Days)</th>
+              <th>Total Revenue</th>
+              <th>Segment</th>
+              <th>Tier</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of data.topCustomers">
+              <td>
+                <a [routerLink]="['/customers', c.id]" class="text-white hover:text-blue-400 font-medium transition-colors text-sm">
+                  {{ c.name }}
+                </a>
+                <div class="text-[10px] text-slate-500 font-mono">{{ c.id }}</div>
+              </td>
+              <td class="text-emerald-400 font-bold">${{ c.clv | number:'1.0-0' }}</td>
+              <td class="text-slate-300">${{ c.revenue | number }}</td>
+              <td><span class="segment-badge" [ngClass]="getSegmentClass(c.segment)">{{ c.segment }}</span></td>
+              <td><span class="tier-badge" [ngClass]="getTierClass(c.tier)">{{ c.tier }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- At-Risk High-Tier Customers -->
+    <div class="glass-card p-6 animate-in animate-in-delay-7">
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <h2 class="section-title flex items-center gap-2">
+            <span class="material-symbols-outlined text-rose-400 text-lg">crisis_alert</span>
+            At-Risk High-Value Customers
+          </h2>
+          <p class="section-subtitle">Customers that need immediate attention</p>
+        </div>
+        <div class="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-rose-500/10 border border-rose-500/20">
+          <span class="pulse-dot red"></span>
+          <span class="text-rose-400 text-[10px] font-bold uppercase tracking-wider">{{ data.atRiskHighValue.length }} Alerts</span>
+        </div>
+      </div>
+      <div class="scroll-container">
+        <table class="dash-table">
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Predicted CLV (Next 180 Days)</th>
+              <th>Total Revenue</th>
+              <th>Days Since Last Purchase</th>
+              <th>Recommended Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of data.atRiskHighValue">
+              <td>
+                <a [routerLink]="['/customers', c.id]" class="text-white hover:text-blue-400 font-medium transition-colors text-sm">
+                  {{ c.name }}
+                </a>
+                <div class="text-[10px] text-slate-500 font-mono">{{ c.id }}</div>
+              </td>
+              <td class="text-amber-400 font-bold">${{ c.clv | number:'1.0-0' }}</td>
+              <td class="text-slate-300">${{ c.revenue | number }}</td>
+              <td>
+                <span class="text-rose-400 font-semibold">{{ c.recency }}</span>
+                <span class="text-slate-500 text-[10px] ml-0.5">days</span>
+              </td>
+              <td class="text-xs text-blue-400 font-medium">{{ c.action }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!-- FOOTER NAV                                                           -->
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <div *ngIf="data" class="flex flex-col sm:flex-row items-center justify-center gap-4 pb-8 animate-in animate-in-delay-8">
+    <button routerLink="/customers" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-900/30 flex items-center gap-2 text-sm">
+      <span class="material-symbols-outlined text-lg">group</span>
+      View All Customers
+    </button>
+    <button routerLink="/home" class="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 font-bold rounded-xl transition-all flex items-center gap-2 text-sm">
+      <span class="material-symbols-outlined text-lg">home</span>
+      Back to Home
+    </button>
+  </div>
+
+</div>
