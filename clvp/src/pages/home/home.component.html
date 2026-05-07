@@ -447,13 +447,13 @@
                         <div class="text-center md:text-left flex-1">
                             <h3 class="text-white text-3xl font-bold mb-3">{{ analysisStatus === 'complete' ? 'Analysis
                                 Complete' : 'Processing Segments' }}</h3>
-                            <p class="text-slate-400 text-lg mb-6 leading-relaxed">Deep learning models are identifying
+                            <p class="text-slate-400 text-lg mb-6 leading-relaxed">The XGBoost Model is identifying
                                 high-value cohorts and behavioral patterns across your dataset.</p>
                             <div class="flex flex-wrap items-center justify-center md:justify-start gap-6 text-sm">
                                 <span class="text-slate-500 font-medium flex items-center gap-2"
                                     *ngIf="analysisStatus !== 'complete'">
                                     <span class="material-symbols-outlined text-lg">schedule</span>
-                                    Est. {{ (100 - analysisProgress) / 5 | number:'1.0-0' }}s remaining
+                                    Model training in progress...
                                 </span>
                                 <span
                                     class="flex items-center gap-2 text-electric-blue font-bold px-3 py-1 bg-electric-blue/10 rounded-lg border border-electric-blue/20"
