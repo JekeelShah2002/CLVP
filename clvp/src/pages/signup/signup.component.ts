@@ -67,4 +67,12 @@ export class SignupComponent {
       this.loader.hide();
     }
   }
+
+  async loginWithGoogle() {
+    try {
+      await this.auth.loginWithGoogle();
+    } catch (e: any) {
+      this.ns.error('Failed to signup with Google.');
+    }
+  }
 }

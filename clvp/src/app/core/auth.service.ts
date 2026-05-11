@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { ID, Models } from 'appwrite';
+import { ID, Models, OAuthProvider } from 'appwrite';
 import { AppwriteService } from './appwrite.service';
 
 @Injectable({ providedIn: 'root' })
@@ -63,6 +63,15 @@ export class AuthService {
     // Clear any stale cached JWT so the next request gets a fresh one
     this.cachedJwt = null;
     this.jwtExpiresAt = 0;
+  }
+
+  async loginWithGoogle() {
+    console.log('[Auth] Attempting Google OAuth login...');
+    this.appwrite.account.createOAuth2Session(
+      OAuthProvider.Google,
+      `${window.location.origin}/home`,
+      `${window.location.origin}/login`
+    );
   }
 
   async logout() {

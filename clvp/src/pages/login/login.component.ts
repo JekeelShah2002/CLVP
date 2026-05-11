@@ -67,4 +67,12 @@ export class LoginComponent {
   togglePwd() {
     this.showPassword = !this.showPassword;
   }
+
+  async loginWithGoogle() {
+    try {
+      await this.auth.loginWithGoogle();
+    } catch (e: any) {
+      this.ns.error('Failed to login with Google.');
+    }
+  }
 }
